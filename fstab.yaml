@@ -1,0 +1,9 @@
+mountpoints:
+  /:
+    url: https://content.ent-da.live/ssa-eds/da-live-ams-1128-west/
+    type: markup
+
+folders:
+  /app/: /apps/custom/shell
+
+  # comment

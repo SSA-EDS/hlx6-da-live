@@ -1,0 +1,12 @@
+main {
+  position: relative;
+}
+
+/* Don't confuse people if sidekick pops open in the editor */
+helix-sidekick, aem-sidekick {
+  display: none !important;
+}
+
+button, input {
+  font-family: var(--body-font-family);
+}

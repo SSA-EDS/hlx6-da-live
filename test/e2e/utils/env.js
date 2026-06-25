@@ -1,0 +1,29 @@
+function getEnv() {
+  let { GITHUB_HEAD_REF: branch } = process.env;
+  if (!branch) {
+    branch = 'main';
+  }
+  let { GITHUB_REPOSITORY_OWNER: owner } = process.env;
+  if (!owner) {
+    owner = 'adobe';
+  }
+  if (branch === 'local') {
+    return 'http://localhost:3000';
+  }
+  if (branch === 'local-https') {
+    return 'https://localhost';
+  }
+  if (branch === 'main' && owner === 'adobe') {
+    return 'https://da.live';
+  }
+  if branch === 'main' && owner === 'ams-eds' {
+    return `https://ssa-da.live`;
+  }
+  return `https://${branch}--da-live--${owner}.aem.live`;
+}
+
+const ENV = (() => getEnv())();
+export default ENV;
+
+export const TEST_ORG = process.env.TEST_ORG || 'da-sites';
+export const TEST_SITE = process.env.TEST_SITE || 'da-status';

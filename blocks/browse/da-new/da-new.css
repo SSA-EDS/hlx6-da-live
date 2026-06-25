@@ -1,0 +1,131 @@
+button {
+  font-family: var(--body-font-family);
+}
+
+.da-actions-create {
+  padding: 0;
+  display: flex;
+  list-style: none;
+  position: relative;
+}
+
+.da-actions-menu {
+  display: none;
+  position: absolute;
+  left: -6px;
+  top: 40px;
+  margin: 0 0 0 6px;
+  list-style: none;
+  background: var(--s2-gray-25);
+  box-shadow: 0 0 5px 0 var(--s2-gray-500);
+  border-radius: 10px;
+  padding: 6px;
+  z-index: 100;
+}
+
+.da-actions-input-container {
+  display: none;
+  gap: 12px;
+}
+
+.da-actions-new-button {
+  text-transform: uppercase;
+}
+
+.da-actions-new-button,
+.da-actions-button {
+  background-color: var(--s2-blue-900);
+  border-radius: 8px;
+  border: 2px solid var(--s2-blue-900);
+  border-color: var(--s2-blue-900);
+  color: #FFF;
+  display: inline-block;
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 18px;
+  padding: 5px 14px;
+  text-decoration: none;
+  outline-offset: 0;
+  outline-color: var(--spectrum-blue-900);
+  transition: outline-offset .2s;
+}
+
+.da-actions-new-button:disabled {
+  color: var(--s2-gray-700);
+  background-color: transparent;
+  outline-color: var(--s2-gray-700);
+  border: 2px solid var(--s2-gray-700);
+  border-style: dotted;
+  cursor: not-allowed;
+}
+
+.da-actions-create.menu .da-actions-menu {
+  display: grid;
+  gap: 6px;
+}
+
+.da-actions-create.upload .da-actions-new-button,
+.da-actions-create.input .da-actions-new-button {
+  display: none;
+}
+
+.da-actions-create.input .da-actions-input-container {
+  display: flex;
+}
+
+.da-actions-file-container {
+  display: none;
+}
+
+.da-actions-create.upload .da-actions-file-container {
+  display: flex;
+  gap: 12px;
+}
+
+.da-actions-input {
+  border: 3px solid #FFF;
+  border-radius: 6px;
+  padding: 0 4px;
+}
+
+.da-actions-file-label {
+  background: rgb(255 255 255);
+  border: 2px solid;
+  border-radius: 6px;
+  padding: 4px 8px 0;
+  color: rgb(6 108 231);
+  font-size: 0.85rem;
+  line-height: 20px;
+  font-weight: 700;
+}
+
+.da-actions-file {
+  display: none;
+}
+
+.da-actions-menu-item button {
+  display: block;
+  width: 100px;
+  text-align: left;
+  line-height: 28px;
+  border: none;
+  padding: 0 10px;
+  border-radius: 6px;
+  background: transparent;
+}
+
+li.da-actions-menu-item button:hover {
+  background: var(--s2-gray-100);
+}
+
+.da-input-error {
+  border: 1px solid red !important;
+  background-color: #ffebee; /* Light red background */
+  outline-color: red; /* For focus states */
+}
+
+.da-input-error::placeholder {
+  color: red;
+  opacity: 0.8;
+}

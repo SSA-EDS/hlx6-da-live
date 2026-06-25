@@ -1,0 +1,102 @@
+import { LitElement, html, nothing } from 'da-lit';
+import { getNx } from '../../../scripts/utils.js';
+
+const nx = getNx();
+
+// SL Components
+await import(`${nx}/public/sl/components.js`);
+
+// Styles
+const { loadStyle } = await import(`${nx}/utils/utils.js`);
+const STYLE = await loadStyle(import.meta.url);
+
+export default class DaDialog extends LitElement {
+  static properties = {
+    title: { type: String },
+    message: { attribute: false },
+    action: { state: true },
+    emphasis: { type: String }, // quiet
+    size: { type: String }, // 'small', 'medium', 'large', 'auto'
+    showCloseButton: { type: Boolean, attribute: 'show-close-button' },
+    _showLazyModal: { state: true },
+  };
+
+  constructor() {
+    super();
+    this.showCloseButton = true;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.shadowRoot.adoptedStyleSheets = [STYLE];
+    setTimeout(() => { this.showModal(); }, 20);
+  }
+
+  updated() {
+    if (this._showLazyModal && this._dialog) {
+      this._showLazyModal = undefined;
+      this.showModal();
+    }
+  }
+
+  showModal() {
+    if (!this._dialog) {
+      this._showLazyModal = true;
+      return;
+    }
+    this._dialog.showModal();
+  }
+
+  close() {
+    this._dialog?.close();
+
+    const event = new CustomEvent('close', { bubbles: true, composed: true });
+    this.dispatchEvent(event);
+  }
+
+  get _dialog() {
+    return this.shadowRoot.querySelector('sl-dialog');
+  }
+
+  _getNativeDialog() {
+    return this._dialog?.shadowRoot?.querySelector('dialog');
+  }
+
+  render() {
+    const sizeClass = this.size ? `da-dialog-${this.size}` : '';
+    const emphasisClass = this.emphasis ? `da-dialog-${this.emphasis}` : '';
+
+    return html`
+      <sl-dialog overflow="hidden" @close=${this.close}>
+        <div class="da-dialog-inner ${sizeClass} ${emphasisClass}" part="inner">
+          <div class="da-dialog-header" part="header">
+            <p class="sl-heading-m">${this.title}</p>
+            ${this.showCloseButton ? html`<button
+              class="da-dialog-close-btn"
+              @click=${this.close}
+              aria-label="Close dialog">
+              <svg class="icon"><use href="/blocks/browse/img/S2IconClose20N-icon.svg#S2IconClose20N-icon"></use></svg>
+            </button>` : nothing}
+          </div>
+          <hr/>
+          <div class="da-dialog-content" part="content">
+            <slot></slot>
+          </div>
+          ${this.action ? html`<div class="da-dialog-footer" part="footer">
+            <div class="da-dialog-footer-left" part="footer-left">
+              <slot name="footer-left"></slot>
+              <p class="da-dialog-footer-message">${this.message || nothing}</p>
+            </div>
+            <slot name="footer-right">
+              <sl-button class="${this.action.style}" @click=${this.action.click} ?disabled=${this.action.disabled}>
+                ${this.action.label}
+              </sl-button>
+            </slot>
+          </div>` : nothing}
+        </div>
+      </sl-dialog>
+    `;
+  }
+}
+
+customElements.define('da-dialog', DaDialog);

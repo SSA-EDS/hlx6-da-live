@@ -1,0 +1,12 @@
+{
+  "project": "DA Live",
+  "host": "ent-da.live",
+  "plugins": [
+    {
+      "id": "da-tags",
+      "title": "Tag Browser",
+      "environments": ["da-edit"],
+      "url": "https://main--bacom-sandbox--adobecom.hlx.live/tools/tags.html"
+    }
+  ]
+}
