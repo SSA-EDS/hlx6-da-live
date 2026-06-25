@@ -2,7 +2,7 @@
 import { DOMParser } from 'da-y-wrapper';
 import getPathDetails from '../../../shared/pathDetails.js';
 import { daFetch, fetchDaConfigs, getFirstSheet, getSheetByName } from '../../../shared/utils.js';
-import { CON_ORIGIN } from '../../../shared/constants.js';
+import { CON_ORIGIN, AEM_HOST_PAGE, AEM_HOST_LIVE } from '../../../shared/constants.js';
 import { openAssets } from '../../da-assets/da-assets.js';
 import { fetchKeyAutocompleteData } from '../../prose/plugins/slashMenu/keyAutocomplete.js';
 import { getNx2Api, sanitizeName } from '../../../../scripts/utils.js';
@@ -131,7 +131,7 @@ function calculateSources(org, repo, sheetPath) {
     if (ref === 'local') return `http://localhost:3000${path}`;
 
     // Fallback to the ref in search param (defaults to main)
-    return `https://${ref}--${repo}--${org}.ent-aem.live${path}`;
+    return `https://${ref}--${repo}--${org}.${AEM_HOST_LIVE}${path}`;
   });
 }
 
@@ -235,11 +235,11 @@ export function getPreviewUrl(previewUrl) {
     if (url.origin.includes('--')) return url.href;
     if (url.origin.includes('content.ent-da.live')) {
       const [, org, site, ...split] = url.pathname.split('/');
-      return `https://${ref}--${site}--${org}.ent-aem.page/${split.join('/')}`;
+      return `https://${ref}--${site}--${org}.${AEM_HOST_PAGE}/${split.join('/')}`;
     }
     if (url.origin.includes('admin.ent-da.live')) {
       const [, , org, site, ...split] = url.pathname.split('/');
-      return `https://${ref}--${site}--${org}.ent-aem.page/${split.join('/')}`;
+      return `https://${ref}--${site}--${org}.${AEM_HOST_PAGE}/${split.join('/')}`;
     }
   } catch {
     return false;

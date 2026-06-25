@@ -1,5 +1,6 @@
 import { LitElement, html, nothing } from 'da-lit';
 import { getNx, sanitizeName } from '../../../scripts/utils.js';
+import { AEM_HOST_PAGE } from '../../shared/constants.js';
 
 const { loadStyle } = await import(`${getNx()}/utils/utils.js`);
 const styles = await loadStyle(import.meta.url);
@@ -122,7 +123,7 @@ export default class DaSites extends LitElement {
             @change="${() => { this._urlError = false; }}" 
             type="text" name="siteUrl" 
             aria-label="Site URL"
-            placeholder="https://main--site--org.ent-aem.page" 
+            placeholder="${`https://main--site--org.${AEM_HOST_PAGE}`}"
             class="${this._urlError ? 'error' : nothing}" 
         />
         <div class="da-form-btn-offset">

@@ -1,4 +1,6 @@
-export const AEM_ORIGIN = 'https://admin.ent-aem.page';
+export const AEM_HOST_PAGE = process.env.HLX_PROD_SERVER_HOST_PAGE;
+export const AEM_HOST_LIVE = process.env.HLX_PROD_SERVER_HOST_LIVE;
+export const AEM_ORIGIN = `https://admin.${AEM_HOST_PAGE}`;
 
 export const SUPPORTED_FILES = {
   html: 'text/html',

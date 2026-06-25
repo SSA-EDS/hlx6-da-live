@@ -54,6 +54,7 @@
     "test:e2e": "cd test/e2e && npm i && npm run test:all",
     "build:da-lit": "esbuild --format=esm --minify ./deps/lit/src/index.js --bundle --outfile=./deps/lit/dist/index.js",
     "build:da-y-wrapper": "esbuild --format=esm --minify ./deps/da-y-wrapper/src/index.js --bundle --outfile=./deps/da-y-wrapper/dist/index.js",
-    "build:da-parser": "./tools/build-da-parser.sh"
+    "build:da-parser": "./tools/build-da-parser.sh",
+    "build:env": "node build.js"
   }
 }
