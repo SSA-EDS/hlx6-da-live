@@ -78,6 +78,6 @@ describe('da-sheet-preview', () => {
   it('getUrl builds aem.page URLs from relative paths', async () => {
     el = await fixture();
     el.details = { repo: 'repo', owner: 'org' };
-    expect(el.getUrl('/some/path')).to.equal('https://main--repo--org.ent-aem.page/some/path');
+    expect(el.getUrl('/some/path')).to.equal('https://main--repo--org.entmseds.page/some/path');
   });
 });

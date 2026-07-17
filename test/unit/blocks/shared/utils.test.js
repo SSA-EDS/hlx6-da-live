@@ -427,7 +427,7 @@ describe('aemAdmin', () => {
     };
 
     await aemAdmin('/owner/repo/folder/page.html', 'preview');
-    expect(capturedUrl).to.equal('https://admin.ent-aem.page/preview/owner/repo/main/folder/page');
+    expect(capturedUrl).to.equal('https://admin.entmseds.page/preview/owner/repo/main/folder/page');
   });
 
   it('Strips .html extension from name', async () => {
@@ -521,7 +521,7 @@ describe('getSidekickConfig', () => {
   it('Returns preview and prod when both hosts are available', async () => {
     const org = 'org1';
     const site = 'site1';
-    const configUrl = `https://admin.ent-aem.page/sidekick/${org}/${site}/main/config.json`;
+    const configUrl = `https://admin.entmseds.page/sidekick/${org}/${site}/main/config.json`;
 
     const mockFetch = (url) => {
       if (url === configUrl) {
@@ -549,7 +549,7 @@ describe('getSidekickConfig', () => {
   it('Returns object when only previewHost is available', async () => {
     const org = 'org2';
     const site = 'site2';
-    const configUrl = `https://admin.ent-aem.page/sidekick/${org}/${site}/main/config.json`;
+    const configUrl = `https://admin.entmseds.page/sidekick/${org}/${site}/main/config.json`;
 
     const mockFetch = (url) => {
       if (url === configUrl) {
@@ -571,7 +571,7 @@ describe('getSidekickConfig', () => {
   it('Returns object when only host is available', async () => {
     const org = 'org3';
     const site = 'site3';
-    const configUrl = `https://admin.ent-aem.page/sidekick/${org}/${site}/main/config.json`;
+    const configUrl = `https://admin.entmseds.page/sidekick/${org}/${site}/main/config.json`;
 
     const mockFetch = (url) => {
       if (url === configUrl) {
@@ -593,7 +593,7 @@ describe('getSidekickConfig', () => {
   it('Returns empty object when neither previewHost nor host is available', async () => {
     const org = 'org4';
     const site = 'site4';
-    const configUrl = `https://admin.ent-aem.page/sidekick/${org}/${site}/main/config.json`;
+    const configUrl = `https://admin.entmseds.page/sidekick/${org}/${site}/main/config.json`;
 
     const mockFetch = (url) => {
       if (url === configUrl) {
