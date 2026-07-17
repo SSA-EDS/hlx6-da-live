@@ -233,11 +233,11 @@ export function getPreviewUrl(previewUrl) {
     const url = new URL(previewUrl);
 
     if (url.origin.includes('--')) return url.href;
-    if (url.origin.includes('content.ent-da.live')) {
+    if (url.origin.includes('content.entmseds-da.live')) {
       const [, org, site, ...split] = url.pathname.split('/');
       return `https://${ref}--${site}--${org}.${AEM_HOST_PAGE}/${split.join('/')}`;
     }
-    if (url.origin.includes('admin.ent-da.live')) {
+    if (url.origin.includes('admin.entmseds-da.live')) {
       const [, , org, site, ...split] = url.pathname.split('/');
       return `https://${ref}--${site}--${org}.${AEM_HOST_PAGE}/${split.join('/')}`;
     }
@@ -256,11 +256,11 @@ export function getAemUrlVars(url) {
       return [org, site, branch];
     }
 
-    if (urlObj.origin.includes('content.ent-da.live')) {
+    if (urlObj.origin.includes('content.entmseds-da.live')) {
       const [, org, site] = urlObj.pathname.split('/');
       return [org, site, 'main'];
     }
-    if (urlObj.origin.includes('admin.ent-da.live')) {
+    if (urlObj.origin.includes('admin.entmseds-da.live')) {
       const [, , org, site] = urlObj.pathname.split('/');
       return [org, site, 'main'];
     }
@@ -291,7 +291,7 @@ export function getItemDetails(item) {
     return { org, site, pathname };
   }
   // DA Content Flavor
-  if (hostname.includes('content.ent-da.live') || hostname.includes('content.da.live')) {
+  if (hostname.includes('content.entmseds-da.live') || hostname.includes('content.da.live')) {
     const [org, site, ...rest] = pathname.slice(1).split('/');
     return { org, site, pathname: `/${rest.join('/')}` };
   }

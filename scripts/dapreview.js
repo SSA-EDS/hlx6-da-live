@@ -1,7 +1,7 @@
 import { AEM_HOST_PAGE } from '../blocks/shared/constants.js';
 
 const daLiveHostBase = AEM_HOST_PAGE.slice(0, -5).replace(/\./g, '\\.');
-const daLiveOriginPattern = new RegExp(`^https://[a-z0-9-]+--da-live-ams-1128-west--ssa-eds\\.${daLiveHostBase}\\.(page|live)$`);
+const daLiveOriginPattern = new RegExp(`^https://[a-z0-9-]+--hlx6-da-live--ssa-eds\\.${daLiveHostBase}\\.(page|live)$`);
 
 let port;
 
@@ -52,7 +52,7 @@ export default async function daPreview(loadPage) {
   }
 
   function initPort(e) {
-    if (e.origin !== 'https://ent-da.live'
+    if (e.origin !== 'https://entmseds-da.live'
       && e.origin !== 'http://localhost:3000'
       && e.origin !== 'https://localhost'
       && !e.origin.match(daLiveOriginPattern)

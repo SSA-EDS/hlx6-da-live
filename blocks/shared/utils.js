@@ -3,11 +3,11 @@ import { getNx, getNx2Api } from '../../scripts/utils.js';
 
 // const DA_ORIGINS = ['https://da.live', 'https://da.page', 'https://admin.da.live', 'https://admin.da.page', 'https://stage-admin.da.live', 'https://content.da.live', 'http://localhost:8787'];
 const DA_ORIGINS = [
-  'https://ent-da.live', // PROD
-  'https://ent-da.page', // PROD
-  'https://admin.ent-da.live', // PROD
-  'https://admin.ent-da.page', // PROD
-  'https://content.ent-da.live', // PROD
+  'https://entmseds-da.live', // PROD
+  'https://entmseds-da.page', // PROD
+  'https://admin.entmseds-da.live', // PROD
+  'https://admin.entmseds-da.page', // PROD
+  'https://content.entmseds-da.live', // PROD
   'http://localhost:8787'];
 
 const AEM_ORIGINS = [AEM_ORIGIN, `https://admin.${AEM_HOST_LIVE}`];

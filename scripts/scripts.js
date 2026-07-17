@@ -49,7 +49,7 @@ link.setAttribute('href', `${nx}${nxCSS}`);
 document.head.appendChild(link);
 
 const CONFIG = {
-  hostnames: ['ent-da.live', 'ent-da.page'],
+  hostnames: ['entmseds-da.live', 'entmseds-da.page'],
   codeBase: import.meta.url.replace('/scripts/scripts.js', ''),
   providers: { da: window.location.origin },
   decorateArea,
