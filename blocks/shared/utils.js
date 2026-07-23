@@ -10,7 +10,7 @@ const DA_ORIGINS = [
   'https://content.entmseds-da.live', // PROD
   'http://localhost:8787'];
 
-const AEM_ORIGINS = [AEM_ORIGIN, `https://admin.${AEM_HOST_LIVE}`];
+const AEM_ORIGINS = ['https://admin.entmseds.page', 'https://admin.entmseds.live'];
 const ETC_ORIGINS = ['https://stage-content.entmseds-da.live', 'https://helix-snapshot-scheduler-ci.adobeaem.workers.dev', 'https://helix-snapshot-scheduler-prod.adobeaem.workers.dev'];
 const ALLOWED_TOKEN = [...DA_ORIGINS, ...AEM_ORIGINS, ...ETC_ORIGINS];
 

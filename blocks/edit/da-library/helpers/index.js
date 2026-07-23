@@ -2,7 +2,7 @@ import { daFetch, getFirstSheet, getSheetByName } from '../../../shared/utils.js
 import { getMetadata } from '../../utils/helpers.js';
 import { parseDom, aemToContentUrl, daFetchLibrary } from './helpers.js';
 
-const AEM_DOMAIN_SUFFIXES = ['entmseds.page', 'entmseds.live', AEM_HOST_PAGE, AEM_HOST_LIVE];
+const AEM_DOMAIN_SUFFIXES = ['entmseds.page', 'entmseds.live'];
 
 function isHeading(element) {
   return ['H1', 'H2', 'H3', 'H4', 'H5', 'H6'].some((name) => element?.nodeName === name);
