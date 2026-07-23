@@ -14,7 +14,7 @@ Unlike typical AEM EDS sites that pull from SharePoint/Google Docs, da-live uses
 ```yaml
 mountpoints:
   /:
-    url: https://content.da.live/adobe/da-live/
+    url: https://content.entmseds-da.live/adobe/da-live/
     type: markup
 ```
 
@@ -118,19 +118,19 @@ aem up
 **Best for:** Have Adobe access, want their exact content
 
 **Requirements:**
-- Access to https://da.live
+- Access to https://entmseds-da.live
 - Valid auth token
 - Permission to read `/adobe/da-live/` content
 
 **Export Script:**
 ```bash
-# Get token from da.live localStorage
+# Get token from entmseds-da.live localStorage
 TOKEN="your-token" node tools/export-content.js
 ```
 
 **Manual Alternative:**
 ```bash
-# 1. Visit https://da.live/browse#/adobe/da-live
+# 1. Visit https://entmseds-da.live/browse#/adobe/da-live
 # 2. Download files through UI
 # 3. Upload to your da-admin at /your-org/da-live
 # 4. Use Option 2 fstab config
@@ -154,12 +154,12 @@ TOKEN="your-token" node tools/export-content.js
 **File:** `blocks/shared/constants.js`
 ```javascript
 // BEFORE:
-export const DA_ORIGIN = 'https://admin.da.live';
-export const AEM_ORIGIN = 'https://admin.hlx.page';
+export const DA_ORIGIN = 'https://admin.entmseds-da.live';
+export const AEM_ORIGIN = 'https://admin.entmseds.page';
 
 // AFTER:
 export const DA_ORIGIN = process.env.DA_ADMIN_ORIGIN || 'https://admin.da-gov.live';
-export const AEM_ORIGIN = process.env.HLX_ADMIN_ORIGIN || 'https://admin.gov-aem.page';
+export const AEM_ORIGIN = process.env.HLX_ADMIN_ORIGIN || 'https://admin.gov-entmseds.page';
 ```
 
 **File:** `blocks/shared/utils.js`
@@ -203,7 +203,7 @@ npm run build:da-y-wrapper
 ### Step 3: Update Domain References
 ```bash
 # Search and replace domain references
-grep -r "admin.da.live" blocks/ scripts/
+grep -r "admin.entmseds-da.live" blocks/ scripts/
 # Update to admin.da-gov.live
 ```
 

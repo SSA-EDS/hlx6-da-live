@@ -10,7 +10,7 @@ const { fetchDaConfigs, getFirstSheet } = await import(`${getNx()}/utils/daConfi
 
 const ref = new URLSearchParams(window.location.search).get('ref') || 'main';
 
-const AEM_ORIGINS = ['hlx.page', 'hlx.live', 'aem.page', 'aem.live'];
+const AEM_ORIGINS = ['entmseds.page', 'entmseds.live', 'entmseds.page', 'entmseds.live'];
 const REPLACE_CONTENT = '<content>';
 
 // ---------------------------------------------------------------------------
@@ -205,7 +205,7 @@ function calculateSources(org, site, sheetPath) {
     const trimmed = p.trim();
     if (!trimmed.startsWith('/')) return trimmed;
     if (ref === 'local') return `http://localhost:3000${trimmed}`;
-    return `https://${ref}--${site}--${org}.aem.live${trimmed}`;
+    return `https://${ref}--${site}--${org}.entmseds.live${trimmed}`;
   });
 }
 
@@ -413,14 +413,14 @@ export function getItemPreviewUrl(item, { org, site }) {
   if (hostname.includes('.aem.')) {
     const parts = hostname.split('.')[0].split('--').reverse();
     [itemOrg, itemSite] = parts;
-  } else if (hostname.includes('content.da.live')) {
+  } else if (hostname.includes('content.entmseds-da.live')) {
     const segments = pathname.slice(1).split('/');
     [itemOrg, itemSite] = segments;
     itemPath = `/${segments.slice(2).join('/')}`;
   }
 
   return {
-    previewUrl: `https://${ref}--${itemSite}--${itemOrg}.aem.page${itemPath}`,
+    previewUrl: `https://${ref}--${itemSite}--${itemOrg}.entmseds.page${itemPath}`,
     org: itemOrg,
     site: itemSite,
     pathname: itemPath,

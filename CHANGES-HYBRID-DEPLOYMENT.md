@@ -3,8 +3,8 @@
 ## ✅ Configuration Complete!
 
 The da-live-ams frontend has been configured for **Hybrid Deployment**:
-- 📄 **Content from Adobe** (`content.da.live`)
-- 🔧 **APIs to YOUR GovCloud** (`admin.da-gov.live`, `admin.gov-aem.page`)
+- 📄 **Content from Adobe** (`content.entmseds-da.live`)
+- 🔧 **APIs to YOUR GovCloud** (`admin.da-gov.live`, `admin.gov-entmseds.page`)
 
 ---
 
@@ -17,8 +17,8 @@ The da-live-ams frontend has been configured for **Hybrid Deployment**:
 // BEFORE:
 const DA_ADMIN_ENVS = {
   local: 'http://localhost:8787',
-  stage: 'https://stage-admin.da.live',
-  prod: 'https://admin.da.live',      // Adobe
+  stage: 'https://stage-admin.entmseds-da.live',
+  prod: 'https://admin.entmseds-da.live',      // Adobe
 };
 
 // AFTER:
@@ -34,8 +34,8 @@ const DA_ADMIN_ENVS = {
 // BEFORE:
 const DA_COLLAB_ENVS = {
   local: 'ws://localhost:4711',
-  stage: 'wss://stage-collab.da.live',
-  prod: 'wss://collab.da.live',       // Adobe
+  stage: 'wss://stage-collab.entmseds-da.live',
+  prod: 'wss://collab.entmseds-da.live',       // Adobe
 };
 
 // AFTER:
@@ -51,8 +51,8 @@ const DA_COLLAB_ENVS = {
 // NEW ADDITION:
 const AEM_ADMIN_ENVS = {
   local: 'http://localhost:3000',
-  stage: 'https://stage-admin.gov-aem.page',
-  prod: 'https://admin.gov-aem.page',  // YOUR GOVCLOUD HELIX-ADMIN
+  stage: 'https://stage-admin.gov-entmseds.page',
+  prod: 'https://admin.gov-entmseds.page',  // YOUR GOVCLOUD HELIX-ADMIN
 };
 ```
 
@@ -87,27 +87,27 @@ import { DA_ORIGIN, AEM_ORIGIN } from './constants.js';
 #### Updated Allowed Origins:
 ```javascript
 // BEFORE:
-const DA_ORIGINS = ['https://da.live', 'https://da.page', 'https://admin.da.live', ...];
-const AEM_ORIGINS = ['https://admin.hlx.page', 'https://admin.aem.live'];
+const DA_ORIGINS = ['https://entmseds-da.live', 'https://da.page', 'https://admin.entmseds-da.live', ...];
+const AEM_ORIGINS = ['https://admin.entmseds.page', 'https://admin.entmseds.live'];
 
 // AFTER:
 const DA_ORIGINS = [
-  'https://da.live',
+  'https://entmseds-da.live',
   'https://da.page',
-  'https://admin.da.live',
+  'https://admin.entmseds-da.live',
   'https://admin.da.page',
-  'https://stage-admin.da.live',
-  'https://content.da.live',
-  'https://stage-content.da.live',
+  'https://stage-admin.entmseds-da.live',
+  'https://content.entmseds-da.live',
+  'https://stage-content.entmseds-da.live',
   'https://admin.da-gov.live',          // ← YOUR GOVCLOUD da-admin
   'https://stage-admin.da-gov.live',    // ← YOUR GOVCLOUD da-admin stage
   'http://localhost:8787'
 ];
 const AEM_ORIGINS = [
-  'https://admin.hlx.page',
-  'https://admin.aem.live',
-  'https://admin.gov-aem.page',         // ← YOUR GOVCLOUD helix-admin
-  'https://stage-admin.gov-aem.page',   // ← YOUR GOVCLOUD helix-admin stage
+  'https://admin.entmseds.page',
+  'https://admin.entmseds.live',
+  'https://admin.gov-entmseds.page',         // ← YOUR GOVCLOUD helix-admin
+  'https://stage-admin.gov-entmseds.page',   // ← YOUR GOVCLOUD helix-admin stage
 ];
 ```
 
@@ -116,7 +116,7 @@ const AEM_ORIGINS = [
 // BEFORE:
 export async function aemAdmin(path, api, method = 'POST') {
   // ...
-  const aemUrl = `https://admin.hlx.page/${api}/${owner}/${repo}/main/${parts.join('/')}`;
+  const aemUrl = `https://admin.entmseds.page/${api}/${owner}/${repo}/main/${parts.join('/')}`;
   // ...
 }
 
@@ -146,7 +146,7 @@ import { DA_ORIGIN, AEM_ORIGIN } from '../shared/constants.js';
 // BEFORE:
 async function bulkAemAdmin(org, site, files) {
   // ...
-  const aemUrl = `https://admin.hlx.page/preview/${org}/${site}/main/*`;
+  const aemUrl = `https://admin.entmseds.page/preview/${org}/${site}/main/*`;
   // ...
 }
 
@@ -166,7 +166,7 @@ async function bulkAemAdmin(org, site, files) {
 # Points to Adobe's content (marketing/help pages)
 mountpoints:
   /:
-    url: https://content.da.live/adobe/da-live/
+    url: https://content.entmseds-da.live/adobe/da-live/
     type: markup
 
 folders:
@@ -187,7 +187,7 @@ User visits https://da-gov.live
 ┌────────┴─────────────────────────────────────────────┐
 │                                                       │
 │  1. Static Content (Homepage, Help, UI)              │
-│     fstab.yaml → content.da.live/adobe/da-live/      │
+│     fstab.yaml → content.entmseds-da.live/adobe/da-live/      │
 │     ✅ Adobe's content                                │
 │                                                       │
 │  2. Save/Load Document APIs                          │
@@ -196,7 +196,7 @@ User visits https://da-gov.live
 │     ✅ YOUR R2 buckets                                │
 │                                                       │
 │  3. Preview/Publish APIs                             │
-│     AEM_ORIGIN → admin.gov-aem.page                  │
+│     AEM_ORIGIN → admin.gov-entmseds.page                  │
 │     ✅ YOUR helix-admin (AWS Lambda GovCloud)         │
 │     ✅ YOUR S3 buckets                                │
 │                                                       │
@@ -214,7 +214,7 @@ https://da-gov.live
 
 # APIs automatically use:
 # - DA_ADMIN_ENVS.prod → https://admin.da-gov.live
-# - AEM_ADMIN_ENVS.prod → https://admin.gov-aem.page
+# - AEM_ADMIN_ENVS.prod → https://admin.gov-entmseds.page
 ```
 
 ### Override for Testing (URL Parameters)
@@ -258,7 +258,7 @@ localStorage.removeItem('aem-admin');
 - [ ] Open browser DevTools → Network tab
 - [ ] Visit: `https://da-gov.live/edit#/testorg/testsite/test.html`
 - [ ] Click "New Document" or load existing
-- [ ] Verify API calls go to `admin.da-gov.live` (not `admin.da.live`)
+- [ ] Verify API calls go to `admin.da-gov.live` (not `admin.entmseds-da.live`)
 - [ ] Save document
 - [ ] Verify save goes to `admin.da-gov.live`
 - [ ] Check YOUR R2 bucket for saved file
@@ -266,9 +266,9 @@ localStorage.removeItem('aem-admin');
 ### Preview/Publish (to YOUR GovCloud)
 - [ ] Open a document in editor
 - [ ] Click "Preview"
-- [ ] Verify API call goes to `admin.gov-aem.page` (not `admin.hlx.page`)
+- [ ] Verify API call goes to `admin.gov-entmseds.page` (not `admin.entmseds.page`)
 - [ ] Check YOUR S3 bucket `helix-content-bus-8` for published content
-- [ ] Visit preview URL: `https://main--testsite--testorg.gov-aem.page/test`
+- [ ] Visit preview URL: `https://main--testsite--testorg.gov-entmseds.page/test`
 
 ---
 
@@ -287,7 +287,7 @@ console.log('AEM_ORIGIN:', AEM_ORIGIN);
 **Should show:**
 ```
 DA_ORIGIN: https://admin.da-gov.live
-AEM_ORIGIN: https://admin.gov-aem.page
+AEM_ORIGIN: https://admin.gov-entmseds.page
 ```
 
 **If not:**
@@ -300,14 +300,14 @@ AEM_ORIGIN: https://admin.gov-aem.page
 ### Issue: 404 on homepage
 
 **Possible causes:**
-1. Adobe's content.da.live is not accessible
-2. CORS blocking content.da.live
+1. Adobe's content.entmseds-da.live is not accessible
+2. CORS blocking content.entmseds-da.live
 3. fstab.yaml not properly configured
 
 **Solutions:**
 - Check browser console for CORS errors
 - Verify fstab.yaml has correct mountpoint
-- Test direct access: `https://content.da.live/adobe/da-live/`
+- Test direct access: `https://content.entmseds-da.live/adobe/da-live/`
 
 ---
 

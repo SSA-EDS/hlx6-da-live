@@ -19,7 +19,7 @@
 │                                                              │
 │  1. STATIC CONTENT (fstab.yaml)                             │
 │     ↓                                                        │
-│     Adobe's content.da.live/adobe/da-live/                  │
+│     Adobe's content.entmseds-da.live/adobe/da-live/                  │
 │     • Marketing pages                                        │
 │     • Help documentation                                     │
 │     • UI text/images                                         │
@@ -44,7 +44,7 @@
 # fstab.yaml - UNCHANGED from Adobe
 mountpoints:
   /:
-    url: https://content.da.live/adobe/da-live/
+    url: https://content.entmseds-da.live/adobe/da-live/
     type: markup
 
 folders:
@@ -70,8 +70,8 @@ folders:
 // CURRENT (Adobe):
 const DA_ADMIN_ENVS = {
   local: 'http://localhost:8787',
-  stage: 'https://stage-admin.da.live',
-  prod: 'https://admin.da.live',
+  stage: 'https://stage-admin.entmseds-da.live',
+  prod: 'https://admin.entmseds-da.live',
 };
 
 // YOUR GOVCLOUD VERSION:
@@ -82,10 +82,10 @@ const DA_ADMIN_ENVS = {
 };
 
 // CURRENT (Adobe):
-export const AEM_ORIGIN = 'https://admin.hlx.page';
+export const AEM_ORIGIN = 'https://admin.entmseds.page';
 
 // YOUR GOVCLOUD VERSION:
-export const AEM_ORIGIN = 'https://admin.gov-aem.page';  // ← YOUR helix-admin
+export const AEM_ORIGIN = 'https://admin.gov-entmseds.page';  // ← YOUR helix-admin
 ```
 
 **What this provides:**
@@ -106,7 +106,7 @@ User → https://da-gov.live/
        ↓
     fstab.yaml routes to:
        ↓
-    https://content.da.live/adobe/da-live/index.html
+    https://content.entmseds-da.live/adobe/da-live/index.html
        ↓
     Adobe's marketing homepage loads
        ✅ Shows Adobe's branding/content
@@ -174,20 +174,20 @@ User clicks "Preview"
        ↓
     aemAdmin(path, 'preview', 'POST')
        ↓
-    const aemUrl = `https://admin.hlx.page/${api}/...`
+    const aemUrl = `https://admin.entmseds.page/${api}/...`
                     ↓
     WAIT - this is still Adobe!
        ↓
     Need to change to:
     const aemUrl = `${AEM_ORIGIN}/${api}/...`
-    where AEM_ORIGIN = 'https://admin.gov-aem.page'
+    where AEM_ORIGIN = 'https://admin.gov-entmseds.page'
        ↓
     YOUR helix-admin-ams (AWS Lambda GovCloud)
        ↓
     Publishes to YOUR helix-content-bus-8 (S3 GovCloud)
        ↓
     Preview available at:
-    https://main--mysite--myorg.gov-aem.page
+    https://main--mysite--myorg.gov-entmseds.page
        
     ✅ Preview on YOUR infrastructure
 ```
@@ -239,8 +239,8 @@ localStorage.setItem('da-admin', 'stage');
 // BEFORE:
 const DA_ADMIN_ENVS = {
   local: 'http://localhost:8787',
-  stage: 'https://stage-admin.da.live',
-  prod: 'https://admin.da.live',
+  stage: 'https://stage-admin.entmseds-da.live',
+  prod: 'https://admin.entmseds-da.live',
 };
 
 // AFTER:
@@ -263,7 +263,7 @@ export async function aemAdmin(path, api, method = 'POST') {
   const [owner, repo, ...parts] = path.slice(1).split('/');
   const name = parts.pop() || repo || owner;
   parts.push(name.replace('.html', ''));
-  const aemUrl = `https://admin.hlx.page/${api}/${owner}/${repo}/main/${parts.join('/')}`;
+  const aemUrl = `https://admin.entmseds.page/${api}/${owner}/${repo}/main/${parts.join('/')}`;
   //                ^^^^^^^^^^^^^^^^^^^^^^^ HARDCODED!
   const resp = await daFetch(aemUrl, { method });
   // ...
@@ -294,8 +294,8 @@ export async function aemAdmin(path, api, method = 'POST') {
 
 const AEM_ADMIN_ENVS = {
   local: 'http://localhost:3000',
-  stage: 'https://stage-admin.gov-aem.page',
-  prod: 'https://admin.gov-aem.page',        // ← YOUR helix-admin
+  stage: 'https://stage-admin.gov-entmseds.page',
+  prod: 'https://admin.gov-entmseds.page',        // ← YOUR helix-admin
 };
 
 export const getAemAdmin = (() => {
@@ -316,22 +316,22 @@ export const AEM_ORIGIN = (() => getDaEnv(window.location, 'aem-admin', AEM_ADMI
 
 ```javascript
 // blocks/shared/utils.js (lines 6-8) - BEFORE:
-const DA_ORIGINS = ['https://da.live', 'https://da.page', 'https://admin.da.live', ...];
-const AEM_ORIGINS = ['https://admin.hlx.page', 'https://admin.aem.live'];
+const DA_ORIGINS = ['https://entmseds-da.live', 'https://da.page', 'https://admin.entmseds-da.live', ...];
+const AEM_ORIGINS = ['https://admin.entmseds.page', 'https://admin.entmseds.live'];
 
 // AFTER:
 const DA_ORIGINS = [
-  'https://da.live',              // Keep for content fetch
+  'https://entmseds-da.live',              // Keep for content fetch
   'https://da.page',              // Keep for content fetch
-  'https://admin.da.live',        // Keep for content fetch
-  'https://content.da.live',      // Keep for content fetch
+  'https://admin.entmseds-da.live',        // Keep for content fetch
+  'https://content.entmseds-da.live',      // Keep for content fetch
   'https://admin.da-gov.live',    // ← ADD: Your da-admin
   'http://localhost:8787'         // Local dev
 ];
 
 const AEM_ORIGINS = [
-  'https://admin.hlx.page',       // Keep for reference
-  'https://admin.gov-aem.page',   // ← ADD: Your helix-admin
+  'https://admin.entmseds.page',       // Keep for reference
+  'https://admin.gov-entmseds.page',   // ← ADD: Your helix-admin
 ];
 ```
 
@@ -352,7 +352,7 @@ export const daFetch = async (url, opts = {}) => {
   
   const urlOrigin = new URL(url).origin;
   const isGovCloudAPI = urlOrigin === 'https://admin.da-gov.live' 
-                     || urlOrigin === 'https://admin.gov-aem.page';
+                     || urlOrigin === 'https://admin.gov-entmseds.page';
   
   if (isGovCloudAPI) {
     // Use Okta token for GovCloud APIs
@@ -394,7 +394,7 @@ export const daFetch = async (url, opts = {}) => {
               │                                     │
               ▼                                     ▼
     ┌─────────────────────┐            ┌──────────────────────┐
-    │   fstab.yaml        │───────────▶│  content.da.live     │
+    │   fstab.yaml        │───────────▶│  content.entmseds-da.live     │
     │   mountpoint        │            │  /adobe/da-live/     │
     └─────────────────────┘            │                      │
                                        │  Adobe's Content     │
@@ -423,7 +423,7 @@ export const daFetch = async (url, opts = {}) => {
               │                                     │
               ▼                                     ▼
     ┌─────────────────────┐            ┌──────────────────────┐
-    │   AEM_ORIGIN        │───────────▶│  admin.gov-aem.page  │
+    │   AEM_ORIGIN        │───────────▶│  admin.gov-entmseds.page  │
     │   constants.js      │            │  (YOUR helix-admin)  │
     └─────────────────────┘            │                      │
                                        │  AWS Lambda GovCloud │
@@ -459,7 +459,7 @@ localStorage.removeItem('aem-admin');
 
 // Switch to your APIs
 localStorage.setItem('da-admin', 'prod');  // → admin.da-gov.live
-localStorage.setItem('aem-admin', 'prod'); // → admin.gov-aem.page
+localStorage.setItem('aem-admin', 'prod'); // → admin.gov-entmseds.page
 
 // Or use URL params
 ?da-admin=prod&aem-admin=prod
@@ -474,7 +474,7 @@ localStorage.setItem('aem-admin', 'prod'); // → admin.gov-aem.page
 
 ## ⚠️ Challenges & Solutions
 
-### Challenge 1: CORS from Adobe's content.da.live
+### Challenge 1: CORS from Adobe's content.entmseds-da.live
 
 **Problem:** Adobe's content server might not allow your domain
 
@@ -495,7 +495,7 @@ localStorage.setItem('aem-admin', 'prod'); // → admin.gov-aem.page
 
 ### Challenge 3: Hardcoded URLs in Content
 
-**Problem:** Adobe's marketing pages may link to `da.live`
+**Problem:** Adobe's marketing pages may link to `entmseds-da.live`
 
 **Solution:**
 - Most links are relative (✅ work fine)
@@ -589,7 +589,7 @@ open "http://localhost:3000/?da-admin=local&aem-admin=local"
 3. Click "Sign In" → Should go to Okta
 4. Create test document
 5. Verify save goes to admin.da-gov.live
-6. Click preview → Should use admin.gov-aem.page
+6. Click preview → Should use admin.gov-entmseds.page
 7. Check your R2/S3 buckets for data
 ```
 

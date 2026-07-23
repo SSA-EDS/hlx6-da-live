@@ -424,10 +424,10 @@ describe('da-library handleOpenPreview', () => {
       { status: 200 },
     ));
     await fixture();
-    const item = { name: 'Marquee', path: 'https://main--repo--org.aem.live/page' };
+    const item = { name: 'Marquee', path: 'https://main--repo--org.entmseds.live/page' };
     await el.handleOpenPreview(item);
     expect(el._preview.name).to.equal('Marquee');
-    expect(el._preview.url).to.contain('aem.page/page');
+    expect(el._preview.url).to.contain('entmseds.page/page');
     expect(el._preview.ok).to.be.true;
   });
 
@@ -437,7 +437,7 @@ describe('da-library handleOpenPreview', () => {
       { status: 200 },
     ));
     await fixture();
-    const item = { key: 'k', value: 'https://main--repo--org.aem.live/page' };
+    const item = { key: 'k', value: 'https://main--repo--org.entmseds.live/page' };
     await el.handleOpenPreview(item);
     expect(el._preview.name).to.equal('k');
     expect(el._preview.ok).to.be.false;

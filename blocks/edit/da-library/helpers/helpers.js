@@ -45,7 +45,7 @@ function setupBlockOptions(library) {
   if (blockJsonUrl) fetchKeyAutocompleteData(blockJsonUrl);
 }
 
-const AEM_CONTENT_HOST = /\.(aem|hlx)\.(page|live)$/;
+const AEM_CONTENT_HOST = /\.entmseds\.(page|live)$/;
 
 export function aemToContentUrl(url) {
   try {
@@ -61,7 +61,7 @@ export function aemToContentUrl(url) {
   }
 }
 
-// Try the content.da.live rewrite first; fall back to the original URL on 404
+// Try the content.entmseds-da.live rewrite first; fall back to the original URL on 404
 export async function daFetchLibrary(url, { skipRewrite = false } = {}) {
   if (skipRewrite) {
     return { resp: await daFetch(url, { noRedirect: true }), usedFallback: true };
@@ -286,12 +286,12 @@ export function getItemDetails(item) {
   const { hostname, pathname } = url;
 
   // AEM Flavor
-  if (hostname.includes('.aem.')) {
+  if (hostname.includes('.entmseds.')) {
     const [org, site] = hostname.split('.')[0].split('--').reverse();
     return { org, site, pathname };
   }
   // DA Content Flavor
-  if (hostname.includes('content.da.live')) {
+  if (hostname.includes('content.entmseds-da.live')) {
     const [org, site, ...rest] = pathname.slice(1).split('/');
     return { org, site, pathname: `/${rest.join('/')}` };
   }

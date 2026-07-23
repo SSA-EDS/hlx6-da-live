@@ -14,9 +14,12 @@ function getEnv() {
     return 'https://localhost';
   }
   if (branch === 'main' && owner === 'adobe') {
-    return 'https://da.live';
+    return 'https://entmseds-da.live';
   }
-  return `https://${branch}--da-live--${owner}.aem.live`;
+  if branch === 'main' && owner === 'ssa-eds' {
+    return `https://entmseds-da.live`;
+  }
+  return `https://${branch}--da-live--${owner}.entmseds.live`;
 }
 
 const ENV = (() => getEnv())();

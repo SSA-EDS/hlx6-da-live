@@ -46,7 +46,7 @@ class PreflightLink extends LitElement {
 
   async normalizeHref(supplied) {
     const { org, site } = this.details;
-    const aemOrigin = `https://main--${site}--${org}.aem.live`;
+    const aemOrigin = `https://main--${site}--${org}.entmseds.live`;
 
     // Path only — build full AEM URL
     const href = supplied.startsWith('/')

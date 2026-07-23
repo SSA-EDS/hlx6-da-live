@@ -53,7 +53,7 @@ The behaviour of the asset selector is determined entirely by the `aem.repositor
 
 ## Configuration
 
-All keys are set in the DA site config at `https://da.live/config#/<org>/` or `https://da.live/config#/<org>/<repo>/`. Repo-level values take precedence over org-level.
+All keys are set in the DA site config at `https://entmseds-da.live/config#/<org>/` or `https://entmseds-da.live/config#/<org>/<repo>/`. Repo-level values take precedence over org-level.
 
 | Key | Required | Values | Description |
 |---|---|---|---|

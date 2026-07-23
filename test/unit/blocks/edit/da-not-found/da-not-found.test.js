@@ -101,7 +101,7 @@ describe('showNotFoundDialog', () => {
     const promise = showNotFoundDialog(details);
     await waitForDialog();
 
-    expect(fetchCalls[0]).to.equal('https://admin.da.live/list/org/repo/some/missing-doc');
+    expect(fetchCalls[0]).to.equal('https://admin.entmseds-da.live/list/org/repo/some/missing-doc');
 
     // Clean up by cancelling.
     document.querySelector('da-dialog').querySelector('sl-button[slot="footer-left"]').click();

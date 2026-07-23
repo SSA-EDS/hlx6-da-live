@@ -5,7 +5,7 @@ function getEditUrl(aemUrl) {
   const hostParts = parsed.hostname.split('.')[0].split('--');
   const repo = hostParts[1];
   const org = hostParts[2];
-  return `https://da.live/edit#/${org}/${repo}${parsed.pathname}`;
+  return `https://entmseds-da.live/edit#/${org}/${repo}${parsed.pathname}`;
 }
 
 export async function saveOffer(config, name, content, aemUrl, displayName, offerId) {

@@ -9,7 +9,7 @@ const FPO_IMG_URL = '/blocks/edit/img/fpo.svg';
 
 function makeHash(string) {
   return Math.abs(string.split('').reduce((hash, char) => (
-    // eslint-disable-next-line no-bitwise -- same hash as da.live paste uploader
+    // eslint-disable-next-line no-bitwise -- same hash as entmseds-da.live paste uploader
     char.charCodeAt(0) + (hash << 6) + (hash << 16) - hash
   ), 0));
 }

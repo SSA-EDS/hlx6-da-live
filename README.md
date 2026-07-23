@@ -1,5 +1,5 @@
 # Edge Delivery Authoring
-This repo provides the author experience for https://da.live.
+This repo provides the author experience for https://entmseds-da.live.
 
 ## Developing
 ### Run
@@ -9,15 +9,15 @@ This repo provides the author experience for https://da.live.
 1. Start building.
 
 ### Authentication
-DA requires an Adobe Identity. You will need a _Stage_ Adobe Identity to work on `localhost` or `aem.page`.
+DA requires an Adobe Identity. You will need a _Stage_ Adobe Identity to work on `localhost` or `entmseds.page`.
 
 #### DA to IMS environment mapping
 | Domain | IMS Tier |
 | :--- | :--- |
 | `localhost` | IMS Stage |
-| `aem.page` | IMS Stage |
-| `aem.live` | IMS Prod |
-| `da.live` | IMS Prod |
+| `entmseds.page` | IMS Stage |
+| `entmseds.live` | IMS Prod |
+| `entmseds-da.live` | IMS Prod |
 
 ### Content
 Local development will use DA's stage content repository. If you don't have any content or configs there, make some.
@@ -35,7 +35,7 @@ You will want to point your local to stage admin & collab or run these services 
 If you wish to do any testing that involves Edge Delivery, please note the following:
 
 1. Your local environment will be using Stage Adobe Identity. 
-1. Your local/stage project will need to have a stage compatible fstab entry. Hostname: `stage-content.da.live`
+1. Your local/stage project will need to have a stage compatible fstab entry. Hostname: `stage-content.entmseds-da.live`
 1. Edge Delivery cannot validate a Stage Adobe Identity. Your stage project should have auth turned off: `requireAuth: false`
 
 ## Additional details

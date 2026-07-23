@@ -314,7 +314,7 @@ class DaStart extends LitElement {
           </ul>
         </div>
         <div class="text-container">
-          <p>Don't forget to add the <a href="https://da.live/bot">AEM Code Sync App</a> to your repository.</p>
+          <p>Don't forget to add the <a href="https://entmseds-da.live/bot">AEM Code Sync App</a> to your repository.</p>
         </div>
       </div>
     `;

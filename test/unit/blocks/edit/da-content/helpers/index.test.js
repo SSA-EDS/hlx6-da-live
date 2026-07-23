@@ -24,8 +24,8 @@ describe('UE URLs', () => {
 
     try {
       window.fetch = mockFetch;
-      const ueUrl = await ueUrlHelper('aabsites', 'gov', 'https://main--gov--geometrixx.aem.page/query-builder');
-      expect(ueUrl).to.equal('https://experience.adobe.com/#/@sitesinternal/aem/editor/canvas/main--gov--geometrixx.ue.da.page/query-builder');
+      const ueUrl = await ueUrlHelper('aabsites', 'gov', 'https://main--gov--geometrixx.entmseds.page/query-builder');
+      expect(ueUrl).to.equal('https://experience.adobe.com/#/@sitesinternal/aem/editor/canvas/main--gov--geometrixx.ue.entmseds-da.page/query-builder');
     } finally {
       window.fetch = orgFetch;
     }
@@ -37,8 +37,8 @@ describe('UE URLs', () => {
 
     try {
       window.fetch = mockFetch;
-      const ueUrl = await ueUrlHelper('aabsites', 'gov', 'https://main--gov--geometrixx.aem.page/query-builder');
-      expect(ueUrl).to.equal('https://experience.adobe.com/#/@sitesinternal/aem/editor/canvas/main--gov--geometrixx.ue.da.page/query-builder');
+      const ueUrl = await ueUrlHelper('aabsites', 'gov', 'https://main--gov--geometrixx.entmseds.page/query-builder');
+      expect(ueUrl).to.equal('https://experience.adobe.com/#/@sitesinternal/aem/editor/canvas/main--gov--geometrixx.ue.entmseds-da.page/query-builder');
     } finally {
       window.fetch = orgFetch;
     }
@@ -50,7 +50,7 @@ describe('UE URLs', () => {
 
     try {
       window.fetch = mockFetch;
-      const ueUrl = await ueUrlHelper('aabsites-gone', 'gov', 'https://main--gov--geometrixx.aem.page/query-builder');
+      const ueUrl = await ueUrlHelper('aabsites-gone', 'gov', 'https://main--gov--geometrixx.entmseds.page/query-builder');
       expect(ueUrl).to.be.null;
     } finally {
       window.fetch = orgFetch;
@@ -61,7 +61,7 @@ describe('UE URLs', () => {
     const orgFetch = window.fetch;
     try {
       window.fetch = async () => ({ ok: true, json: async () => ({ data: [{ key: 'other', value: 'x' }] }) });
-      const url = await ueUrlHelper('org', 'repo', 'https://main--repo--org.aem.page/page');
+      const url = await ueUrlHelper('org', 'repo', 'https://main--repo--org.entmseds.page/page');
       expect(url).to.equal(null);
     } finally {
       window.fetch = orgFetch;
@@ -75,8 +75,8 @@ describe('UE URLs', () => {
         ok: true,
         json: async () => ({ data: [{ key: 'quick-edit', value: 'repo' }] }),
       });
-      const url = await ueUrlHelper('org-qe', 'repo', 'https://main--repo--org.aem.live/page');
-      expect(url).to.equal('https://main--repo--org.aem.page/page?quick-edit=on');
+      const url = await ueUrlHelper('org-qe', 'repo', 'https://main--repo--org.entmseds.live/page');
+      expect(url).to.equal('https://main--repo--org.entmseds.page/page?quick-edit=on');
     } finally {
       window.fetch = orgFetch;
     }
@@ -89,8 +89,8 @@ describe('UE URLs', () => {
         ok: true,
         json: async () => ({ data: [{ key: 'quick-edit', value: 'repo' }] }),
       });
-      const url = await ueUrlHelper('org-qe-strip', 'repo', 'https://main--repo--org.aem.live/folder/index');
-      expect(url).to.equal('https://main--repo--org.aem.page/folder/?quick-edit=on');
+      const url = await ueUrlHelper('org-qe-strip', 'repo', 'https://main--repo--org.entmseds.live/folder/index');
+      expect(url).to.equal('https://main--repo--org.entmseds.page/folder/?quick-edit=on');
     } finally {
       window.fetch = orgFetch;
     }
@@ -98,13 +98,13 @@ describe('UE URLs', () => {
 
   it('getUeUrl returns null when ueConf has no value', async () => {
     const { getUeUrl } = await import('../../../../../../blocks/edit/da-content/helpers/index.js');
-    const result = await getUeUrl({}, 'https://main--repo--org.aem.page/page');
+    const result = await getUeUrl({}, 'https://main--repo--org.entmseds.page/page');
     expect(result).to.equal(null);
   });
 
   it('getUeUrl returns null when no @org appears in the editor.path value', async () => {
     const { getUeUrl } = await import('../../../../../../blocks/edit/da-content/helpers/index.js');
-    const result = await getUeUrl({ value: '/no-at-org' }, 'https://main--repo--org.aem.page/page');
+    const result = await getUeUrl({ value: '/no-at-org' }, 'https://main--repo--org.entmseds.page/page');
     expect(result).to.equal(null);
   });
 });

@@ -8,14 +8,14 @@ describe('Libs', () => {
   });
 
   it('Default NX on production / CDN', () => {
-    const location = { hostname: 'da.live' };
+    const location = { hostname: 'entmseds-da.live' };
     const libs = setNx('/nx', location);
     expect(libs).to.equal('/nx');
   });
 
   it('Supports NX query param on production', () => {
     const location = {
-      hostname: 'da.live',
+      hostname: 'entmseds-da.live',
       search: '?nx=foo',
     };
     const libs = setNx('/nx', location);

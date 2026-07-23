@@ -21,7 +21,7 @@ The ACL tests require to be logged in, which is what this setup does.
 It is assumed to be configured as follows, where the current est user is in IMS org
 907136ED5D35CBF50A495CD4 and in its group DA-Test BUT NOT iN DA-Nonexist.
 
-The configuration in https://da.live/config#/da-testautomation/ should be as follows:
+The configuration in https://entmseds-da.live/config#/da-testautomation/ should be as follows:
 
   path groups actions
   /acltest/testdocs/readwrite-doc 907136ED5D35CBF50A495CD4/DA-Test write

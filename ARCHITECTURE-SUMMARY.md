@@ -29,7 +29,7 @@ DA Live is **"dogfooding"** - it uses **itself** to author its own content!
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                    USER'S BROWSER                               │
-│              Accesses: https://da.live                          │
+│              Accesses: https://entmseds-da.live                          │
 └───────────┬─────────────────────────────────────────────────────┘
             │
             ▼
@@ -38,7 +38,7 @@ DA Live is **"dogfooding"** - it uses **itself** to author its own content!
 │     Location: /Users/schmidt/Documents/git/da-live-ams          │
 │     Type: AEM Edge Delivery Site                                │
 │     Tech: Lit components, ProseMirror, Yjs                      │
-│     URL: https://da.live                                        │
+│     URL: https://entmseds-da.live                                        │
 │                                                                  │
 │     Provides:                                                    │
 │     • Document editor UI (/blocks/edit/)                        │
@@ -54,7 +54,7 @@ DA Live is **"dogfooding"** - it uses **itself** to author its own content!
 ┌───────────────────────────────┐    ┌──────────────────▼──────────┐
 │  2. da-admin                  │    │  4. helix-admin-ams         │
 │     Cloudflare Workers        │    │     AWS Lambda GovCloud     │
-│     URL: admin.da.live        │    │     URL: admin.hlx.page     │
+│     URL: admin.entmseds-da.live        │    │     URL: admin.entmseds.page     │
 │                               │    │                             │
 │     Provides:                 │    │     Provides:               │
 │     • REST API for files      │    │     • Preview content       │
@@ -79,7 +79,7 @@ DA Live is **"dogfooding"** - it uses **itself** to author its own content!
 ┌────────────┴──────────┐             └──────────────────────────┘
 │  3. da-content-ams     │
 │     Cloudflare Workers │
-│     URL: content.da.live│
+│     URL: content.entmseds-da.live│
 │                        │
 │     Provides:          │
 │     • Content delivery │
@@ -127,7 +127,7 @@ NO authored content pages
 ```yaml
 mountpoints:
   /:
-    url: https://content.da.live/adobe/da-live/
+    url: https://content.entmseds-da.live/adobe/da-live/
     type: markup
 ```
 
@@ -136,8 +136,8 @@ This line tells EDS: **"Get my website content from the da-admin system"**
 It's NOT pulling from SharePoint/Google - it's pulling from DA's own storage!
 
 **The Content Lives At:**
-- API endpoint: `https://admin.da.live/source/adobe/da-live/`
-- Served via: `https://content.da.live/adobe/da-live/`
+- API endpoint: `https://admin.entmseds-da.live/source/adobe/da-live/`
+- Served via: `https://content.entmseds-da.live/adobe/da-live/`
 - Stored in: R2 bucket `aem-content` at path `/adobe/da-live/`
 
 **What's in that content?**
@@ -190,7 +190,7 @@ Author → Word/Google Docs → AEM EDS → Website
 
 ### DA Live Site:
 ```
-Author → DA Editor → da-admin (R2) → content.da.live → Website
+Author → DA Editor → da-admin (R2) → content.entmseds-da.live → Website
                           ↑
                    (Source of Truth)
 ```
@@ -243,7 +243,7 @@ Author → DA Editor → da-admin (R2) → content.da.live → Website
 2. Edit `blocks/shared/constants.js`:
    ```javascript
    export const DA_ORIGIN = 'https://admin.da-gov.live';
-   export const AEM_ORIGIN = 'https://admin.gov-aem.page';
+   export const AEM_ORIGIN = 'https://admin.gov-entmseds.page';
    ```
 
 3. Edit `blocks/shared/utils.js`:
@@ -334,7 +334,7 @@ helix-media-bus-8     - Optimized images/media
 
 3. **What's your domain strategy?**
    - da-gov.live for editor?
-   - gov-aem.live for published sites?
+   - gov-entmseds.live for published sites?
    - Different naming convention?
 
 4. **What's your authentication strategy?**

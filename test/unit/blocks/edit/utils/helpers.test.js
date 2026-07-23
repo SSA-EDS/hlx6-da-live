@@ -31,7 +31,7 @@ const {
 
 // Skip the api.js hlx6 upgrade probe so source/config URLs stay on DA_ADMIN.
 const skipPing = (handler) => async (url, opts) => {
-  if (typeof url === 'string' && url.startsWith('https://admin.hlx.page/ping')) {
+  if (typeof url === 'string' && url.startsWith('https://admin.entmseds.page/ping')) {
     return new Response('', { status: 200, headers: new Headers() });
   }
   return handler(url, opts);
@@ -776,7 +776,7 @@ describe('saveDaVersion', () => {
     window.fetch = (url, opts) => {
       const u = String(url);
       // The hlx6 upgrade probe — advertise the upgrade so the call routes to AEM.
-      if (u.startsWith('https://admin.hlx.page/ping')) {
+      if (u.startsWith('https://admin.entmseds.page/ping')) {
         return Promise.resolve(new Response('', {
           status: 200,
           headers: { 'x-api-upgrade-available': 'da-admin' },

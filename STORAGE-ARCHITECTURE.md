@@ -6,7 +6,7 @@
 
 **Location:** Adobe's CloudFlare account  
 **Bucket Name:** `aem-content`  
-**Your Access:** Read-only via `content.da.live`  
+**Your Access:** Read-only via `content.entmseds-da.live`  
 **Purpose:** Static content for the da-live UI
 
 ```
@@ -96,7 +96,7 @@ helix-media-bus-8/
 │   └── image.png?width=400 (Optimized variant)
 ```
 
-**Used by:** helix-admin (`admin.gov-aem.page`)
+**Used by:** helix-admin (`admin.gov-entmseds.page`)
 
 **API Endpoints:**
 - `POST /preview/org1/site1/main/index` - Publish to preview
@@ -118,7 +118,7 @@ helix-media-bus-8/
 │   ↓                                                          │
 │ Browser: Loads editor UI                                     │
 │   ↓ (fstab.yaml)                                            │
-│ content.da.live/adobe/da-live/blocks/edit/                  │
+│ content.entmseds-da.live/adobe/da-live/blocks/edit/                  │
 │   ↓                                                          │
 │ Adobe's R2: /adobe/da-live/blocks/edit/ (UI components)     │
 │   ↓                                                          │
@@ -150,7 +150,7 @@ helix-media-bus-8/
 │                                                              │
 │ User: Clicks "Preview"                                       │
 │   ↓                                                          │
-│ Browser: POST https://admin.gov-aem.page/preview/myorg/.../  │
+│ Browser: POST https://admin.gov-entmseds.page/preview/myorg/.../  │
 │   ↓                                                          │
 │ helix-admin: Receives preview request                        │
 │   ↓                                                          │
@@ -172,7 +172,7 @@ helix-media-bus-8/
 │                                                              │
 │ ✅ Built content in YOUR S3 bucket                           │
 │                                                              │
-│ Preview URL: https://main--mysite--myorg.gov-aem.page/doc    │
+│ Preview URL: https://main--mysite--myorg.gov-entmseds.page/doc    │
 │                                                              │
 └──────────────────────────────────────────────────────────────┘
 
@@ -182,13 +182,13 @@ helix-media-bus-8/
 │                                                              │
 │ User: Clicks "Publish"                                       │
 │   ↓                                                          │
-│ Browser: POST https://admin.gov-aem.page/live/myorg/.../     │
+│ Browser: POST https://admin.gov-entmseds.page/live/myorg/.../     │
 │   ↓                                                          │
 │ helix-admin: Same process as preview                         │
 │   ↓                                                          │
 │ YOUR S3: helix-content-bus-8 (marked as live)                │
 │                                                              │
-│ Live URL: https://main--mysite--myorg.gov-aem.live/doc       │
+│ Live URL: https://main--mysite--myorg.gov-entmseds.live/doc       │
 │                                                              │
 └──────────────────────────────────────────────────────────────┘
 ```
@@ -266,8 +266,8 @@ r2_buckets = [
 vars = {
   ENVIRONMENT = "ams-prod",
   DA_DOMAIN = "da-gov.live",
-  HLX_PROD_SERVER_HOST_PAGE = "gov-aem.page",
-  HLX_PROD_SERVER_HOST_LIVE = "gov-aem.live",
+  HLX_PROD_SERVER_HOST_PAGE = "gov-entmseds.page",
+  HLX_PROD_SERVER_HOST_LIVE = "gov-entmseds.live",
   AEM_BUCKET_NAME = "aem-content-gov"
 }
 ```
@@ -290,7 +290,7 @@ vars = {
 ```yaml
 mountpoints:
   /:
-    url: https://content.da.live/adobe/da-live/
+    url: https://content.entmseds-da.live/adobe/da-live/
     type: markup
 ```
 
@@ -383,7 +383,7 @@ You need both!
              │                                     │
              │                                     ▼
              │                        ┌─────────────────────────┐
-             │                        │ content.da.live         │
+             │                        │ content.entmseds-da.live         │
              │                        │ (Adobe's CDN)           │
              │                        │         ↓               │
              │                        │ Adobe's R2              │
@@ -409,7 +409,7 @@ You need both!
                                                   │
                                                   ▼
                                      ┌─────────────────────────┐
-                                     │ admin.gov-aem.page      │
+                                     │ admin.gov-entmseds.page      │
                                      │ (YOUR helix-admin)      │
                                      │         ↓               │
                                      │ Reads from: YOUR R2     │

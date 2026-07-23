@@ -524,7 +524,7 @@ async function getDaApiPath(api, org, site, path = '') {
   return `${DA_ADMIN}/source/${org}/${site}${path}`;
 }
 
-// AEM-only endpoints. New API origin or legacy admin.hlx.page with ref=main.
+// AEM-only endpoints. New API origin or legacy admin.entmseds.page with ref=main.
 async function getAemApiPath(api, org, site, path = '') {
   const hlx6 = await isHlx6(org, site);
 

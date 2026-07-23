@@ -3,7 +3,7 @@ import getSheet from '../../../../shared/sheet.js';
 import { initIms, saveToAem, getExistingSchedule } from '../../../../shared/utils.js';
 import { isRegistered, schedulePagePublish } from './utils.js';
 
-const REGISTER_PATH = 'https://da.live/apps/scheduler';
+const REGISTER_PATH = 'https://entmseds-da.live/apps/scheduler';
 
 const sheet = await getSheet(import.meta.url.replace('js', 'css'));
 

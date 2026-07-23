@@ -22,15 +22,15 @@ describe('DaSites', () => {
   });
 
   describe('parseSubdomain', () => {
-    it('Extracts org and repo from a hlx.live URL', () => {
+    it('Extracts org and repo from a entmseds.live URL', () => {
       const el = new DaSites();
-      const result = el.parseSubdomain('https://main--repo--org.hlx.live/');
+      const result = el.parseSubdomain('https://main--repo--org.entmseds.live/');
       expect(result).to.equal('#/org/repo');
     });
 
-    it('Extracts org and repo from an aem.page URL', () => {
+    it('Extracts org and repo from an entmseds.page URL', () => {
       const el = new DaSites();
-      const result = el.parseSubdomain('https://main--my-site--my-org.aem.page/');
+      const result = el.parseSubdomain('https://main--my-site--my-org.entmseds.page/');
       expect(result).to.equal('#/my-org/my-site');
     });
 
@@ -41,7 +41,7 @@ describe('DaSites', () => {
 
     it('Returns null for a malformed helix-style hostname missing org', () => {
       const el = new DaSites();
-      expect(el.parseSubdomain('https://main--repo.hlx.live/')).to.equal(null);
+      expect(el.parseSubdomain('https://main--repo.entmseds.live/')).to.equal(null);
     });
 
     it('Returns null when the URL is invalid', () => {

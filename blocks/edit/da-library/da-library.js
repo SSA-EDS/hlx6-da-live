@@ -240,7 +240,7 @@ class DaLibrary extends LitElement {
     const { org, site, pathname } = getItemDetails(item);
     this._preview = {
       name: item.name || item.key,
-      url: `https://${ref}--${site}--${org}.aem.page${pathname}`,
+      url: `https://${ref}--${site}--${org}.entmseds.page${pathname}`,
     };
 
     // Lazily get the preview status

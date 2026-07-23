@@ -69,7 +69,7 @@ export default class DaSites extends LitElement {
   parseSubdomain(siteUrl) {
     try {
       const url = new URL(siteUrl);
-      if (!url.hostname.match(/hlx\.live$|aem\.live$|hlx\.page$|aem\.page$/)) {
+      if (!url.hostname.match(/entmseds\.live$|entmseds\.page$/)) {
         return null;
       }
       const helixString = url.hostname.split('.')[0];

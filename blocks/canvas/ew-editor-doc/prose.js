@@ -1,4 +1,4 @@
-/* eslint-disable import/no-unresolved -- importmap + da.live prose plugins */
+/* eslint-disable import/no-unresolved -- importmap + entmseds-da.live prose plugins */
 import {
   EditorState,
   EditorView,
@@ -163,7 +163,7 @@ export default async function initProse({
   let viewRef = null;
   const dispatch = (tr) => { if (viewRef) viewRef.dispatch(tr); };
 
-  /* Keymap order matches da.live prose/index.js: baseKeymap after buildKeymap +
+  /* Keymap order matches entmseds-da.live prose/index.js: baseKeymap after buildKeymap +
    * handleTableBackspace (fixes list Enter + table NodeSelection + Backspace). */
   const plugins = [
     ySyncPlugin(yXmlFragment),

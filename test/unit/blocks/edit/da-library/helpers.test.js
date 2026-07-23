@@ -72,18 +72,18 @@ describe('da-library/helpers exports', () => {
 
   describe('getPreviewUrl', () => {
     it('Returns the URL unchanged when origin contains "--"', () => {
-      const url = 'https://main--repo--org.aem.live/page';
+      const url = 'https://main--repo--org.entmseds.live/page';
       expect(getPreviewUrl(url)).to.equal(url);
     });
 
-    it('Rewrites a content.da.live URL to aem.page', () => {
-      expect(getPreviewUrl('https://content.da.live/org/site/folder/page'))
-        .to.equal('https://main--site--org.aem.page/folder/page');
+    it('Rewrites a content.entmseds-da.live URL to entmseds.page', () => {
+      expect(getPreviewUrl('https://content.entmseds-da.live/org/site/folder/page'))
+        .to.equal('https://main--site--org.entmseds.page/folder/page');
     });
 
-    it('Rewrites an admin.da.live URL to aem.page', () => {
-      expect(getPreviewUrl('https://admin.da.live/source/org/site/folder/page'))
-        .to.equal('https://main--site--org.aem.page/folder/page');
+    it('Rewrites an admin.entmseds-da.live URL to entmseds.page', () => {
+      expect(getPreviewUrl('https://admin.entmseds-da.live/source/org/site/folder/page'))
+        .to.equal('https://main--site--org.entmseds.page/folder/page');
     });
 
     it('Returns false for an unrelated origin', () => {
@@ -96,8 +96,8 @@ describe('da-library/helpers exports', () => {
   });
 
   describe('getAemUrlVars', () => {
-    it('Extracts org, site, branch from an aem.live hostname', () => {
-      expect(getAemUrlVars('https://main--repo--org.aem.live/page'))
+    it('Extracts org, site, branch from an entmseds.live hostname', () => {
+      expect(getAemUrlVars('https://main--repo--org.entmseds.live/page'))
         .to.deep.equal(['org', 'repo', 'main']);
     });
 
@@ -121,18 +121,18 @@ describe('da-library/helpers exports', () => {
   });
 
   describe('aemToContentUrl', () => {
-    it('Rewrites aem.page preview URLs to content.da.live', () => {
-      expect(aemToContentUrl('https://main--site--org.aem.page/blocks/cards'))
-        .to.equal('https://content.da.live/org/site/blocks/cards');
+    it('Rewrites entmseds.page preview URLs to content.entmseds-da.live', () => {
+      expect(aemToContentUrl('https://main--site--org.entmseds.page/blocks/cards'))
+        .to.equal('https://content.entmseds-da.live/org/site/blocks/cards');
     });
 
-    it('Rewrites aem.live, hlx.page and hlx.live URLs the same way', () => {
-      expect(aemToContentUrl('https://main--site--org.aem.live/blocks/cards'))
-        .to.equal('https://content.da.live/org/site/blocks/cards');
-      expect(aemToContentUrl('https://main--site--org.hlx.page/blocks/cards'))
-        .to.equal('https://content.da.live/org/site/blocks/cards');
-      expect(aemToContentUrl('https://feature--site--org.hlx.live/deep/nested/path'))
-        .to.equal('https://content.da.live/org/site/deep/nested/path');
+    it('Rewrites entmseds.live and entmseds.page URLs the same way', () => {
+      expect(aemToContentUrl('https://main--site--org.entmseds.live/blocks/cards'))
+        .to.equal('https://content.entmseds-da.live/org/site/blocks/cards');
+      expect(aemToContentUrl('https://main--site--org.entmseds.page/blocks/cards'))
+        .to.equal('https://content.entmseds-da.live/org/site/blocks/cards');
+      expect(aemToContentUrl('https://feature--site--org.entmseds.live/deep/nested/path'))
+        .to.equal('https://content.entmseds-da.live/org/site/deep/nested/path');
     });
 
     it('Leaves content.da.live and admin.da.live URLs unchanged', () => {
@@ -150,23 +150,23 @@ describe('da-library/helpers exports', () => {
   });
 
   describe('getItemDetails', () => {
-    it('Parses an aem.live URL', () => {
-      const result = getItemDetails({ path: 'https://main--repo--org.aem.live/folder/page' });
+    it('Parses an entmseds.live URL', () => {
+      const result = getItemDetails({ path: 'https://main--repo--org.entmseds.live/folder/page' });
       expect(result).to.deep.equal({ org: 'org', site: 'repo', pathname: '/folder/page' });
     });
 
-    it('Parses a content.da.live URL', () => {
-      const result = getItemDetails({ path: 'https://content.da.live/org/site/folder/page' });
+    it('Parses a content.entmseds-da.live URL', () => {
+      const result = getItemDetails({ path: 'https://content.entmseds-da.live/org/site/folder/page' });
       expect(result).to.deep.equal({ org: 'org', site: 'site', pathname: '/folder/page' });
     });
 
-    it('Falls back to admin.da.live shape', () => {
-      const result = getItemDetails({ path: 'https://admin.da.live/source/org/site/folder/page' });
+    it('Falls back to admin.entmseds-da.live shape', () => {
+      const result = getItemDetails({ path: 'https://admin.entmseds-da.live/source/org/site/folder/page' });
       expect(result).to.deep.equal({ org: 'org', site: 'site', pathname: '/folder/page' });
     });
 
     it('Reads value when no path is provided (templates path)', () => {
-      const result = getItemDetails({ value: 'https://main--repo--org.aem.live/page' });
+      const result = getItemDetails({ value: 'https://main--repo--org.entmseds.live/page' });
       expect(result.org).to.equal('org');
     });
   });
@@ -194,7 +194,7 @@ describe('da-library/helpers exports', () => {
         calls.push(url);
         return Promise.resolve(new Response('ok', { status: 200 }));
       };
-      const { resp, usedFallback } = await daFetchLibrary('https://main--repo--org.aem.live/page');
+      const { resp, usedFallback } = await daFetchLibrary('https://main--repo--org.entmseds.live/page');
       expect(resp.status).to.equal(200);
       expect(usedFallback).to.be.false;
       expect(calls).to.deep.equal(['https://content.da.live/org/repo/page']);
@@ -207,12 +207,12 @@ describe('da-library/helpers exports', () => {
         const status = url.startsWith('https://content.da.live/') ? 404 : 200;
         return Promise.resolve(new Response('', { status }));
       };
-      const { resp, usedFallback } = await daFetchLibrary('https://main--repo--org.aem.live/page');
+      const { resp, usedFallback } = await daFetchLibrary('https://main--repo--org.entmseds.live/page');
       expect(resp.status).to.equal(200);
       expect(usedFallback).to.be.true;
       expect(calls).to.deep.equal([
-        'https://content.da.live/org/repo/page',
-        'https://main--repo--org.aem.live/page',
+        'https://content.entmseds-da.live/org/repo/page',
+        'https://main--repo--org.entmseds.live/page',
       ]);
     });
 
@@ -222,7 +222,7 @@ describe('da-library/helpers exports', () => {
         calls.push(url);
         return Promise.resolve(new Response('boom', { status: 500 }));
       };
-      const { resp, usedFallback } = await daFetchLibrary('https://main--repo--org.aem.live/page');
+      const { resp, usedFallback } = await daFetchLibrary('https://main--repo--org.entmseds.live/page');
       expect(resp.status).to.equal(500);
       expect(usedFallback).to.be.false;
       expect(calls).to.deep.equal(['https://content.da.live/org/repo/page']);
@@ -235,12 +235,12 @@ describe('da-library/helpers exports', () => {
         return Promise.resolve(new Response('ok', { status: 200 }));
       };
       const { resp, usedFallback } = await daFetchLibrary(
-        'https://main--repo--org.aem.live/page',
+        'https://main--repo--org.entmseds.live/page',
         { skipRewrite: true },
       );
       expect(resp.status).to.equal(200);
       expect(usedFallback).to.be.true;
-      expect(calls).to.deep.equal(['https://main--repo--org.aem.live/page']);
+      expect(calls).to.deep.equal(['https://main--repo--org.entmseds.live/page']);
     });
 
     it('Forwards opts to daFetch on both attempts', async () => {
@@ -249,7 +249,7 @@ describe('da-library/helpers exports', () => {
         optsSeen.push(opts);
         return Promise.resolve(new Response('', { status: 404 }));
       };
-      await daFetchLibrary('https://main--repo--org.aem.live/page');
+      await daFetchLibrary('https://main--repo--org.entmseds.live/page');
       expect(optsSeen.length).to.equal(2);
       expect(optsSeen[0]?.noRedirect).to.be.true;
       expect(optsSeen[1]?.noRedirect).to.be.true;
@@ -380,8 +380,8 @@ describe('da-library/helpers/index getBlocks', () => {
         { status: 200 },
       ));
     };
-    await getBlocks(['https://main--repo--org.aem.page/blocks.json']);
-    expect(captured).to.equal('https://content.da.live/org/repo/blocks.json');
+    await getBlocks(['https://main--repo--org.entmseds.page/blocks.json']);
+    expect(captured).to.equal('https://content.entmseds-da.live/org/repo/blocks.json');
   });
 
   it('Falls back to the original AEM URL when content.da.live 404s', async () => {
@@ -396,10 +396,10 @@ describe('da-library/helpers/index getBlocks', () => {
         { status: 200 },
       ));
     };
-    await getBlocks(['https://main--repo--org.aem.page/blocks.json']);
+    await getBlocks(['https://main--repo--org.entmseds.page/blocks.json']);
     expect(calls).to.deep.equal([
-      'https://content.da.live/org/repo/blocks.json',
-      'https://main--repo--org.aem.page/blocks.json',
+      'https://content.entmseds-da.live/org/repo/blocks.json',
+      'https://main--repo--org.entmseds.page/blocks.json',
     ]);
   });
 
@@ -409,8 +409,8 @@ describe('da-library/helpers/index getBlocks', () => {
       calls.push(url);
       return Promise.resolve(new Response('boom', { status: 500 }));
     };
-    await getBlocks(['https://main--repo--org.aem.page/blocks.json']);
-    expect(calls).to.deep.equal(['https://content.da.live/org/repo/blocks.json']);
+    await getBlocks(['https://main--repo--org.entmseds.page/blocks.json']);
+    expect(calls).to.deep.equal(['https://content.entmseds-da.live/org/repo/blocks.json']);
   });
 
   it('When the source falls back, variants skip the content.da.live attempt', async () => {
@@ -420,23 +420,23 @@ describe('da-library/helpers/index getBlocks', () => {
       if (url === 'https://content.da.live/org/repo/blocks.json') {
         return Promise.resolve(new Response('not found', { status: 404 }));
       }
-      if (url === 'https://main--repo--org.aem.page/blocks.json') {
+      if (url === 'https://main--repo--org.entmseds.page/blocks.json') {
         return Promise.resolve(new Response(
           JSON.stringify({
             ':type': 'sheet',
-            data: [{ name: 'hero', path: 'https://main--repo--org.aem.page/blocks/hero' }],
+            data: [{ name: 'hero', path: 'https://main--repo--org.entmseds.page/blocks/hero' }],
           }),
           { status: 200 },
         ));
       }
       return Promise.resolve(new Response('', { status: 500 }));
     };
-    const result = await getBlocks(['https://main--repo--org.aem.page/blocks.json']);
+    const result = await getBlocks(['https://main--repo--org.entmseds.page/blocks.json']);
     await Promise.all(result.map((b) => b.loadVariants));
     expect(calls).to.deep.equal([
-      'https://content.da.live/org/repo/blocks.json',
-      'https://main--repo--org.aem.page/blocks.json',
-      'https://main--repo--org.aem.page/blocks/hero.plain.html',
+      'https://content.entmseds-da.live/org/repo/blocks.json',
+      'https://main--repo--org.entmseds.page/blocks.json',
+      'https://main--repo--org.entmseds.page/blocks/hero.plain.html',
     ]);
   });
 
@@ -523,9 +523,9 @@ describe('da-library/helpers/index getBlockVariants', () => {
       const status = url.startsWith('https://content.da.live/') ? 404 : 500;
       return Promise.resolve(new Response('', { status }));
     };
-    await getBlockVariants('https://main--repo--org.aem.live/page');
-    expect(calls[0]).to.equal('https://content.da.live/org/repo/page');
-    expect(calls[1]).to.equal('https://main--repo--org.aem.live/page.plain.html');
+    await getBlockVariants('https://main--repo--org.entmseds.live/page');
+    expect(calls[0]).to.equal('https://content.entmseds-da.live/org/repo/page');
+    expect(calls[1]).to.equal('https://main--repo--org.entmseds.live/page.plain.html');
   });
 
   it('Does not fall back when content.da.live returns non-404', async () => {
@@ -534,7 +534,7 @@ describe('da-library/helpers/index getBlockVariants', () => {
       calls.push(url);
       return Promise.resolve(new Response('boom', { status: 500 }));
     };
-    const result = await getBlockVariants('https://main--repo--org.aem.live/page');
+    const result = await getBlockVariants('https://main--repo--org.entmseds.live/page');
     expect(result).to.deep.equal([]);
     expect(calls).to.deep.equal(['https://content.da.live/org/repo/page']);
   });

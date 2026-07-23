@@ -24,7 +24,7 @@ describe('target/api', () => {
         config,
         'My Offer',
         '<p>hello</p>',
-        'https://main--repo--org.aem.page/path',
+        'https://main--repo--org.entmseds.page/path',
         'Joe',
       );
       expect(result.success).to.equal('Created!');
@@ -34,7 +34,7 @@ describe('target/api', () => {
       const body = JSON.parse(captured.opts.body);
       expect(body.name).to.equal('My Offer');
       expect(body.marketingCloudMetadata.editURL).to.equal(
-        'https://da.live/edit#/org/repo/path',
+        'https://entmseds-da.live/edit#/org/repo/path',
       );
       expect(body.marketingCloudMetadata['aem.lastUpdatedBy']).to.equal('Joe');
     });
@@ -45,14 +45,14 @@ describe('target/api', () => {
         captured = { url, opts };
         return Promise.resolve(new Response('{"id":"oid"}', { status: 200 }));
       };
-      const result = await saveOffer(config, 'n', 'c', 'https://main--r--o.aem.page/p', 'd', 'oid');
+      const result = await saveOffer(config, 'n', 'c', 'https://main--r--o.entmseds.page/p', 'd', 'oid');
       expect(captured.opts.method).to.equal('PUT');
       expect(result.success).to.equal('Updated!');
     });
 
     it('Returns the error text when not ok', async () => {
       window.fetch = () => Promise.resolve(new Response('boom', { status: 400 }));
-      const result = await saveOffer(config, 'n', 'c', 'https://main--r--o.aem.page/p', 'd');
+      const result = await saveOffer(config, 'n', 'c', 'https://main--r--o.entmseds.page/p', 'd');
       expect(result.error).to.equal('boom');
     });
   });

@@ -22,8 +22,8 @@ if (!window.location.hash.startsWith('#/')) {
 const wait = (ms) => new Promise((resolve) => { setTimeout(resolve, ms); });
 
 // createConnection now resolves the collab backend via isHlx6 (nx2 api.js),
-// which pings admin.hlx.page. Mock it so unit tests stay offline: a header-less
-// 200 means "not upgraded" → the legacy admin.da.live room is used, matching
+// which pings admin.entmseds.page. Mock it so unit tests stay offline: a header-less
+// 200 means "not upgraded" → the legacy admin.entmseds-da.live room is used, matching
 // these tests' room URLs. Returns a restore fn.
 const stubHlx6Ping = () => {
   const saved = window.fetch;
@@ -94,7 +94,7 @@ describe('prose/index createConnection', () => {
   });
 
   it('Returns a wsProvider and a Y.Doc with maxBackoffTime configured', async () => {
-    const result = await createConnection('https://admin.da.live/source/org/repo/page.html');
+    const result = await createConnection('https://admin.entmseds-da.live/source/org/repo/page.html');
     expect(result.wsProvider).to.exist;
     expect(result.ydoc).to.exist;
     expect(result.wsProvider.maxBackoffTime).to.equal(30000);
@@ -106,7 +106,7 @@ describe('prose/index createConnection', () => {
     result.ydoc.destroy();
   });
 
-  it('Uses an api.aem.live collab room for a Helix-6 document', async () => {
+  it('Uses an api.entmseds.live collab room for a Helix-6 document', async () => {
     // A ping that advertises the upgrade header makes isHlx6 resolve true.
     // Use an org/site not probed elsewhere so the isHlx6 cache is cold here.
     window.fetch = async () => new Response('', {
@@ -115,12 +115,12 @@ describe('prose/index createConnection', () => {
     });
     try {
       const { wsProvider, ydoc } = await createConnection(
-        'https://admin.da.live/source/hlxorg/hlxsite/dir/page.html',
+        'https://admin.entmseds-da.live/source/hlxorg/hlxsite/dir/page.html',
       );
       // da-collab derives the Helix backend from this prefix; the path matches
-      // the api.aem.live source URL nx2 api.js builds for hlx6 docs.
+      // the api.entmseds.live source URL nx2 api.js builds for hlx6 docs.
       expect(wsProvider.roomname).to.equal(
-        'https://api.aem.live/hlxorg/sites/hlxsite/source/dir/page.html',
+        'https://api.entmseds.live/hlxorg/sites/hlxsite/source/dir/page.html',
       );
       wsProvider.disconnect({ data: 'Client navigation' });
       wsProvider.destroy?.();
@@ -144,7 +144,7 @@ describe('prose/index createConnection', () => {
     };
 
     try {
-      const { wsProvider, ydoc } = await createConnection('https://admin.da.live/source/org/repo/page.html');
+      const { wsProvider, ydoc } = await createConnection('https://admin.entmseds-da.live/source/org/repo/page.html');
       expect(wsProvider.protocols).to.deep.equal(['yjs', 'T-initial']);
 
       // Simulate a server-signalled auth failure
@@ -168,7 +168,7 @@ describe('prose/index createConnection', () => {
     window.adobeIMS = { getAccessToken: () => ({ token: 'T-initial' }) };
 
     try {
-      const { wsProvider, ydoc } = await createConnection('https://admin.da.live/source/org/repo/page.html');
+      const { wsProvider, ydoc } = await createConnection('https://admin.entmseds-da.live/source/org/repo/page.html');
       expect(wsProvider.shouldConnect).to.equal(true);
 
       wsProvider.emit('connection-close', [{ code: 4403, reason: 'forbidden' }, wsProvider]);
@@ -195,7 +195,7 @@ describe('prose/index createConnection', () => {
     };
 
     try {
-      const { wsProvider, ydoc } = await createConnection('https://admin.da.live/source/org/repo/page.html');
+      const { wsProvider, ydoc } = await createConnection('https://admin.entmseds-da.live/source/org/repo/page.html');
 
       // After construction, simulate imslib losing the token (SSO expired)
       window.adobeIMS.getAccessToken = () => null;
@@ -227,7 +227,7 @@ describe('prose/index createConnection', () => {
     };
 
     try {
-      const { wsProvider, ydoc } = await createConnection('https://admin.da.live/source/org/repo/page.html');
+      const { wsProvider, ydoc } = await createConnection('https://admin.entmseds-da.live/source/org/repo/page.html');
       expect(wsProvider.protocols).to.deep.equal(['yjs']);
 
       wsProvider.emit('connection-close', [{ code: 4401, reason: 'auth' }, wsProvider]);
@@ -253,7 +253,7 @@ describe('prose/index createConnection', () => {
     };
 
     try {
-      const { wsProvider, ydoc } = await createConnection('https://admin.da.live/source/org/repo/page.html');
+      const { wsProvider, ydoc } = await createConnection('https://admin.entmseds-da.live/source/org/repo/page.html');
       expect(wsProvider.protocols).to.deep.equal(['yjs', 'T-same']);
 
       wsProvider.emit('connection-close', [{ code: 4401, reason: 'auth' }, wsProvider]);
@@ -288,7 +288,7 @@ describe('prose/index createConnection', () => {
     };
 
     try {
-      const { wsProvider, ydoc } = await createConnection('https://admin.da.live/source/org/repo/page.html');
+      const { wsProvider, ydoc } = await createConnection('https://admin.entmseds-da.live/source/org/repo/page.html');
       expect(wsProvider.shouldConnect).to.equal(true);
 
       // Fire 4401 — handler runs sync up to first await, then yields.
@@ -323,7 +323,7 @@ describe('prose/index createConnection', () => {
     delete window.adobeIMS;
 
     try {
-      const { wsProvider, ydoc } = await createConnection('https://admin.da.live/source/org/repo/page.html');
+      const { wsProvider, ydoc } = await createConnection('https://admin.entmseds-da.live/source/org/repo/page.html');
       expect(wsProvider.protocols).to.deep.equal(['yjs']);
 
       // Simulate a generic network drop — no custom code
@@ -411,7 +411,7 @@ describe('prose/index createConnection rapid-reconnect guard (COR-44)', () => {
   });
 
   it('Healthy reconnect: long-lived session does not trigger manual backoff', async () => {
-    const { wsProvider, ydoc } = await createConnection('https://admin.da.live/source/o/r/p.html');
+    const { wsProvider, ydoc } = await createConnection('https://admin.entmseds-da.live/source/o/r/p.html');
     clearTimers();
     const disconnectSpy = sinon.spy(wsProvider, 'disconnect');
 
@@ -428,7 +428,7 @@ describe('prose/index createConnection rapid-reconnect guard (COR-44)', () => {
   });
 
   it('Single short session arms a 1s manual backoff and reconnects', async () => {
-    const { wsProvider, ydoc } = await createConnection('https://admin.da.live/source/o/r/p.html');
+    const { wsProvider, ydoc } = await createConnection('https://admin.entmseds-da.live/source/o/r/p.html');
     clearTimers();
     const disconnectSpy = sinon.spy(wsProvider, 'disconnect');
     const connectSpy = sinon.spy(wsProvider, 'connect');
@@ -454,7 +454,7 @@ describe('prose/index createConnection rapid-reconnect guard (COR-44)', () => {
   });
 
   it('Repeated short sessions back off exponentially: 1s, 2s, 4s', async () => {
-    const { wsProvider, ydoc } = await createConnection('https://admin.da.live/source/o/r/p.html');
+    const { wsProvider, ydoc } = await createConnection('https://admin.entmseds-da.live/source/o/r/p.html');
     clearTimers();
     const delays = [];
 
@@ -475,7 +475,7 @@ describe('prose/index createConnection rapid-reconnect guard (COR-44)', () => {
   });
 
   it('Backoff caps at 30s after many short sessions', async () => {
-    const { wsProvider, ydoc } = await createConnection('https://admin.da.live/source/o/r/p.html');
+    const { wsProvider, ydoc } = await createConnection('https://admin.entmseds-da.live/source/o/r/p.html');
     clearTimers();
 
     for (let i = 0; i < 6; i += 1) {
@@ -501,7 +501,7 @@ describe('prose/index createConnection rapid-reconnect guard (COR-44)', () => {
   });
 
   it('Long-lived session resets the counter so next short close is 1s again', async () => {
-    const { wsProvider, ydoc } = await createConnection('https://admin.da.live/source/o/r/p.html');
+    const { wsProvider, ydoc } = await createConnection('https://admin.entmseds-da.live/source/o/r/p.html');
     clearTimers();
 
     for (let i = 0; i < 2; i += 1) {
@@ -532,7 +532,7 @@ describe('prose/index createConnection rapid-reconnect guard (COR-44)', () => {
   });
 
   it('Second close without a reconnect open is treated as a short session', async () => {
-    const { wsProvider, ydoc } = await createConnection('https://admin.da.live/source/o/r/p.html');
+    const { wsProvider, ydoc } = await createConnection('https://admin.entmseds-da.live/source/o/r/p.html');
     clearTimers();
 
     // Healthy first session: open, live > 5s, close — no backoff, counter reset.
@@ -564,7 +564,7 @@ describe('prose/index createConnection rapid-reconnect guard (COR-44)', () => {
     };
 
     try {
-      const { wsProvider, ydoc } = await createConnection('https://admin.da.live/source/o/r/p.html');
+      const { wsProvider, ydoc } = await createConnection('https://admin.entmseds-da.live/source/o/r/p.html');
       clearTimers();
       const disconnectSpy = sinon.spy(wsProvider, 'disconnect');
 
@@ -594,7 +594,7 @@ describe('prose/index createConnection rapid-reconnect guard (COR-44)', () => {
     };
 
     try {
-      const { wsProvider, ydoc } = await createConnection('https://admin.da.live/source/o/r/p.html');
+      const { wsProvider, ydoc } = await createConnection('https://admin.entmseds-da.live/source/o/r/p.html');
       clearTimers();
       const connectSpy = sinon.spy(wsProvider, 'connect');
 
@@ -639,7 +639,7 @@ describe('prose/index createAwarenessStatusWidget', () => {
       document,
       addEventListener: () => {},
     };
-    createAwarenessStatusWidget(provider, fakeWin, 'https://admin.da.live/source/o/r/p.html');
+    createAwarenessStatusWidget(provider, fakeWin, 'https://admin.entmseds-da.live/source/o/r/p.html');
     // Set up a remote user state
     const remoteId = 99;
     provider.awareness.getStates().set(remoteId, { user: { id: 'u1', name: 'Alice' } });
@@ -650,7 +650,7 @@ describe('prose/index createAwarenessStatusWidget', () => {
   it('Falls back to "Anonymous" when awareness state has no user id', () => {
     const provider = buildFakeWsProvider();
     const fakeWin = { document, addEventListener: () => {} };
-    createAwarenessStatusWidget(provider, fakeWin, 'https://admin.da.live/source/o/r/p.html');
+    createAwarenessStatusWidget(provider, fakeWin, 'https://admin.entmseds-da.live/source/o/r/p.html');
     const remoteId = 7;
     provider.awareness.getStates().set(remoteId, { user: { /* no id */ name: 'X' } });
     provider.awareness._emit('update', { added: [remoteId], updated: [], removed: [] });
@@ -660,7 +660,7 @@ describe('prose/index createAwarenessStatusWidget', () => {
   it('Updates collabStatus on status events', () => {
     const provider = buildFakeWsProvider();
     const fakeWin = { document, addEventListener: () => {} };
-    createAwarenessStatusWidget(provider, fakeWin, 'https://admin.da.live/source/o/r/p.html');
+    createAwarenessStatusWidget(provider, fakeWin, 'https://admin.entmseds-da.live/source/o/r/p.html');
     provider._emit('status', { status: 'connected' });
     expect(fakeTitle.collabStatus).to.equal('connected');
     provider._emit('status', { status: 'disconnected' });
@@ -681,7 +681,7 @@ describe('prose/index createAwarenessStatusWidget', () => {
       return Promise.resolve(new Response('', { status: 200, headers: {} }));
     };
     try {
-      createAwarenessStatusWidget(provider, fakeWin, 'https://admin.da.live/source/o/r/p.html');
+      createAwarenessStatusWidget(provider, fakeWin, 'https://admin.entmseds-da.live/source/o/r/p.html');
 
       provider._emit('connection-close', { code: 4401, reason: 'auth' }, provider);
       provider._emit('connection-close', { code: 4403, reason: 'forbidden' }, provider);
@@ -709,7 +709,7 @@ describe('prose/index createAwarenessStatusWidget', () => {
         winListeners.get(event).push(cb);
       },
     };
-    createAwarenessStatusWidget(provider, fakeWin, 'https://admin.da.live/source/o/r/p.html');
+    createAwarenessStatusWidget(provider, fakeWin, 'https://admin.entmseds-da.live/source/o/r/p.html');
     // online/offline both set status
     winListeners.get('online').forEach((cb) => cb());
     expect(fakeTitle.collabStatus).to.equal('online');
@@ -725,7 +725,7 @@ describe('prose/index createAwarenessStatusWidget', () => {
   it('Removes user from set when delta.removed is sent', () => {
     const provider = buildFakeWsProvider();
     const fakeWin = { document, addEventListener: () => {} };
-    createAwarenessStatusWidget(provider, fakeWin, 'https://admin.da.live/source/o/r/p.html');
+    createAwarenessStatusWidget(provider, fakeWin, 'https://admin.entmseds-da.live/source/o/r/p.html');
     const id = 11;
     provider.awareness.getStates().set(id, { user: { id: 'u1', name: 'Alice' } });
     provider.awareness._emit('update', { added: [id], updated: [], removed: [] });
@@ -793,7 +793,7 @@ describe('prose/index initProse default export', () => {
         },
         get() { return this._proseEl; },
       });
-      initProse({ path: 'https://admin.da.live/source/o/r/p.html', permissions: ['read', 'write'], doc: null, daContent: fakeContent, wsPromise });
+      initProse({ path: 'https://admin.entmseds-da.live/source/o/r/p.html', permissions: ['read', 'write'], doc: null, daContent: fakeContent, wsPromise });
     });
 
     expect(proseEl).to.exist;
@@ -815,7 +815,7 @@ describe('prose/index initProse default export', () => {
       },
       get() { return this._proseEl; },
     });
-    await initProse({ path: 'https://admin.da.live/source/o/r/p.html', permissions: ['read'], doc: null, daContent: fakeContent, wsPromise });
+    await initProse({ path: 'https://admin.entmseds-da.live/source/o/r/p.html', permissions: ['read'], doc: null, daContent: fakeContent, wsPromise });
     // ProseMirror exposes editable via someProp: it returns the editable() result
     expect(window.view.someProp('editable')(window.view)).to.be.false;
   });
@@ -833,7 +833,7 @@ describe('prose/index initProse default export', () => {
       get() { return this._proseEl; },
     });
     delete window.adobeIMS;
-    await initProse({ path: 'https://admin.da.live/source/o/r/p.html', permissions: ['read', 'write'], doc: null, daContent: fakeContent, wsPromise });
+    await initProse({ path: 'https://admin.entmseds-da.live/source/o/r/p.html', permissions: ['read', 'write'], doc: null, daContent: fakeContent, wsPromise });
     const states = [...provider.awareness.getStates().values()];
     const userState = states.find((s) => s.user);
     expect(userState.user.name).to.equal('Anonymous');
@@ -861,7 +861,7 @@ describe('prose/index initProse default export', () => {
       },
     };
     try {
-      await initProse({ path: 'https://admin.da.live/source/o/r/p.html', permissions: ['read', 'write'], doc: null, daContent: fakeContent, wsPromise });
+      await initProse({ path: 'https://admin.entmseds-da.live/source/o/r/p.html', permissions: ['read', 'write'], doc: null, daContent: fakeContent, wsPromise });
       await wait(10);
       expect(getProfileCalled).to.be.true;
     } finally {
@@ -882,7 +882,7 @@ describe('prose/index initProse default export', () => {
       },
       get() { return this._proseEl; },
     });
-    await initProse({ path: 'https://admin.da.live/source/o/r/p.html', permissions: ['read'], doc: null, daContent: fakeContent, wsPromise: Promise.resolve({ wsProvider: provider, ydoc }) });
+    await initProse({ path: 'https://admin.entmseds-da.live/source/o/r/p.html', permissions: ['read'], doc: null, daContent: fakeContent, wsPromise: Promise.resolve({ wsProvider: provider, ydoc }) });
     expect(destroyed).to.equal(1);
   });
 });
@@ -911,7 +911,7 @@ describe('prose/index registerErrorHandler', () => {
     const provider = buildFakeWsProvider({ withSynced: false });
     setupFakeContent();
     await initProse({
-      path: 'https://admin.da.live/source/o/r/p.html',
+      path: 'https://admin.entmseds-da.live/source/o/r/p.html',
       permissions: ['read'],
       doc: null,
       daContent: fakeContent,

@@ -47,7 +47,7 @@ describe('Browse', () => {
       expect(daBrowse._listItems[0].name).to.equal('d1');
 
       const copyCall = fetchedArgs.find(({ url }) => url.includes('/copy/'));
-      expect(copyCall.url).to.equal('https://admin.da.live/copy/myorg/mysite/myroot/srcdir/d1.html');
+      expect(copyCall.url).to.equal('https://admin.entmseds-da.live/copy/myorg/mysite/myroot/srcdir/d1.html');
       expect(copyCall.opts.body.get('destination')).to.equal('/myorg/mysite/myroot/destdir/d1.html');
       expect(copyCall.opts.method).to.equal('POST');
     } finally {
@@ -83,7 +83,7 @@ describe('Browse', () => {
       await daBrowse.loadMore();
 
       expect(fetchedArgs.length).to.equal(1);
-      expect(fetchedArgs[0].url).to.equal('https://admin.da.live/list/myorg/mysite/myroot/destdir');
+      expect(fetchedArgs[0].url).to.equal('https://admin.entmseds-da.live/list/myorg/mysite/myroot/destdir');
       expect(fetchedArgs[0].opts.headers['da-continuation-token']).to.equal('token-1');
     } finally {
       window.fetch = orgFetch;
@@ -365,36 +365,36 @@ describe('DaBrowse Component', () => {
 
     it('matches a single editor.path row by prefix', async () => {
       daBrowseComp.details = { fullpath: '/myorg-a/mysite/some-doc', org: 'myorg-a', site: 'mysite', owner: 'myorg-a', depth: 3 };
-      mockConfig([{ key: 'editor.path', value: '/myorg-a/mysite=https://experience.adobe.com/#/@dxorg/aem/editor/canvas/main--mysite--myorg.ue.da.live' }]);
+      mockConfig([{ key: 'editor.path', value: '/myorg-a/mysite=https://experience.adobe.com/#/@dxorg/aem/editor/canvas/main--mysite--myorg.ue.entmseds-da.live' }]);
       const url = await daBrowseComp.getEditor(true);
-      expect(url).to.equal('https://experience.adobe.com/#/@dxorg/aem/editor/canvas/main--mysite--myorg.ue.da.live');
+      expect(url).to.equal('https://experience.adobe.com/#/@dxorg/aem/editor/canvas/main--mysite--myorg.ue.entmseds-da.live');
     });
 
     it('prefers the more specific (longer prefix) match over a shorter one', async () => {
       daBrowseComp.details = { fullpath: '/myorg-b/mysite/dealers/acme', org: 'myorg-b', site: 'mysite', owner: 'myorg-b', depth: 4 };
       mockConfig([
-        { key: 'editor.path', value: '/myorg-b/mysite=https://experience.adobe.com/#/@dxorg/aem/editor/canvas/main--mysite--myorg.ue.da.live' },
-        { key: 'editor.path', value: '/myorg-b/mysite/dealers=https://da.live/form#' },
+        { key: 'editor.path', value: '/myorg-b/mysite=https://experience.adobe.com/#/@dxorg/aem/editor/canvas/main--mysite--myorg.ue.entmseds-da.live' },
+        { key: 'editor.path', value: '/myorg-b/mysite/dealers=https://entmseds-da.live/form#' },
       ]);
       const url = await daBrowseComp.getEditor(true);
       // /myorg-b/mysite/dealers is more specific than /myorg-b/mysite even though
       // UE_CONF has a longer total string length
-      expect(url).to.equal('https://da.live/form#');
+      expect(url).to.equal('https://entmseds-da.live/form#');
     });
 
     it('falls back to the broader match when path is outside the specific folder', async () => {
       daBrowseComp.details = { fullpath: '/myorg-c/mysite/other/page', org: 'myorg-c', site: 'mysite', owner: 'myorg-c', depth: 4 };
       mockConfig([
-        { key: 'editor.path', value: '/myorg-c/mysite=https://experience.adobe.com/#/@dxorg/aem/editor/canvas/main--mysite--myorg.ue.da.live' },
-        { key: 'editor.path', value: '/myorg-c/mysite/dealers=https://da.live/form#' },
+        { key: 'editor.path', value: '/myorg-c/mysite=https://experience.adobe.com/#/@dxorg/aem/editor/canvas/main--mysite--myorg.ue.entmseds-da.live' },
+        { key: 'editor.path', value: '/myorg-c/mysite/dealers=https://entmseds-da.live/form#' },
       ]);
       const url = await daBrowseComp.getEditor(true);
-      expect(url).to.equal('https://experience.adobe.com/#/@dxorg/aem/editor/canvas/main--mysite--myorg.ue.da.live');
+      expect(url).to.equal('https://experience.adobe.com/#/@dxorg/aem/editor/canvas/main--mysite--myorg.ue.entmseds-da.live');
     });
 
     it('returns default edit path when no prefix matches the current path', async () => {
       daBrowseComp.details = { fullpath: '/otherorg/othersite/page', org: 'otherorg', site: 'othersite', owner: 'otherorg', depth: 3 };
-      mockConfig([{ key: 'editor.path', value: '/myorg/mysite=https://experience.adobe.com/#/@dxorg/aem/editor/canvas/main--mysite--myorg.ue.da.live' }]);
+      mockConfig([{ key: 'editor.path', value: '/myorg/mysite=https://experience.adobe.com/#/@dxorg/aem/editor/canvas/main--mysite--myorg.ue.entmseds-da.live' }]);
       const url = await daBrowseComp.getEditor(true);
       expect(url).to.equal('/edit#');
     });

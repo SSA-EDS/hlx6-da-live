@@ -9,8 +9,8 @@
  * the terraform environment files, following the same pattern as helix-admin-ams.
  *
  * Variables injected:
- *   HLX_PROD_SERVER_HOST_PAGE  e.g. ent-aem.page, eds.ent-aem.page
- *   HLX_PROD_SERVER_HOST_LIVE  e.g. ent-aem.live, eds.ent-aem.live
+ *   HLX_PROD_SERVER_HOST_PAGE  e.g. entmseds.page, eds.entmseds.page
+ *   HLX_PROD_SERVER_HOST_LIVE  e.g. entmseds.live, eds.entmseds.live
  */
 
 import { readFileSync, writeFileSync } from 'node:fs';

@@ -3,7 +3,7 @@ import ENV from '../../utils/env.js';
 import { getQuery } from '../../utils/page.js';
 
 /*
- * Requires the following config at https://da.live/config#/da-testautomation/:
+ * Requires the following config at https://entmseds-da.live/config#/da-testautomation/:
  *   path                    groups                      actions
  *   /ewtest/+**             907136ED5D35CBF50A495CD4    read
  * And a document at /da-testautomation/ewtest/demo with EW enabled on the site.

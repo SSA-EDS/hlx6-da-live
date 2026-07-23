@@ -414,8 +414,8 @@ describe('DaTitle', () => {
       element.details = createDetails(opts.details || {});
       element.permissions = opts.permissions || ['read', 'write'];
       element._aemHrefs = {
-        preview: { origin: 'https://main--site--org.aem.page' },
-        prod: { origin: 'https://main--site--org.aem.live' },
+        preview: { origin: 'https://main--site--org.entmseds.page' },
+        prod: { origin: 'https://main--site--org.entmseds.live' },
       };
       // Stub _sendButton to avoid querying shadowRoot
       const fakeBtn = document.createElement('button');
@@ -432,7 +432,7 @@ describe('DaTitle', () => {
       window.open = (...args) => { opens.push(args); };
       window.fetch = () => Promise.resolve(new Response(
         JSON.stringify({
-          preview: { url: 'https://main--site--org.aem.page/test/page' },
+          preview: { url: 'https://main--site--org.entmseds.page/test/page' },
           webPath: '/test/page',
         }),
         { status: 200 },
@@ -482,7 +482,7 @@ describe('DaTitle', () => {
       try {
         await element.handleAction('publish');
         expect(opens.length).to.equal(1);
-        expect(opens[0][0]).to.contain('aem.live');
+        expect(opens[0][0]).to.contain('entmseds.live');
       } finally {
         window.open = savedOpen;
       }
@@ -599,7 +599,7 @@ describe('DaTitle', () => {
       try { delete window.chrome; } catch { /* */ }
       const element = new DaTitle();
       // Should not throw
-      await element.sidekickCacheBust('https://main--site--org.aem.live/page');
+      await element.sidekickCacheBust('https://main--site--org.entmseds.live/page');
     });
 
     it('Sends a cache-bust message to the configured extension id', async () => {
@@ -613,9 +613,9 @@ describe('DaTitle', () => {
         },
       };
       const element = new DaTitle();
-      await element.sidekickCacheBust('https://main--site--org.aem.live/page');
+      await element.sidekickCacheBust('https://main--site--org.entmseds.live/page');
       expect(captured.opts.action).to.equal('bustCache');
-      expect(captured.opts.host).to.equal('main--site--org.aem.live');
+      expect(captured.opts.host).to.equal('main--site--org.entmseds.live');
     });
 
     it('Reads the override extension id from localStorage when present', async () => {
@@ -631,7 +631,7 @@ describe('DaTitle', () => {
       };
       try {
         const element = new DaTitle();
-        await element.sidekickCacheBust('https://main--site--org.aem.live/page');
+        await element.sidekickCacheBust('https://main--site--org.entmseds.live/page');
         expect(captured).to.equal('custom-id');
       } finally {
         window.localStorage.removeItem('aem-sidekick-id');
@@ -641,7 +641,7 @@ describe('DaTitle', () => {
     it('Swallows errors from sendMessage', async () => {
       window.chrome = { runtime: { sendMessage: () => Promise.reject(new Error('boom')) } };
       const element = new DaTitle();
-      await element.sidekickCacheBust('https://main--site--org.aem.live/page');
+      await element.sidekickCacheBust('https://main--site--org.entmseds.live/page');
     });
   });
 

@@ -1,6 +1,6 @@
 # da-live-ams — FedRAMP DA Live Site
 
-AMS fork of the da.live application, adapted for FedRAMP/GovCloud deployment.
+AMS fork of the entmseds-da.live application, adapted for FedRAMP/GovCloud deployment.
 
 ## Context
 
@@ -10,12 +10,12 @@ AMS fork of the da.live application, adapted for FedRAMP/GovCloud deployment.
 ## What This Is
 
 - Frontend application (AEM EDS site) for the DA content authoring interface
-- Migrated from `da.live` upstream to run in FedRAMP-bounded environment
-- Rebranded and re-pointed from `da.live` / `aem.live` origins to AMS endpoints
+- Migrated from `entmseds-da.live` upstream to run in FedRAMP-bounded environment
+- Rebranded and re-pointed from `entmseds-da.live` / `entmseds.live` origins to AMS endpoints
 
 ## Key Differences from Upstream
 
-- Origin domains rebranded away from `da.live` / `aem.live`
+- Origin domains rebranded away from `entmseds-da.live` / `entmseds.live`
 - Storage backend points to AMS S3 (not Cloudflare R2 public)
 - Auth flows adapted for FedRAMP identity providers
 

@@ -14,14 +14,14 @@ export async function getUeUrl(ueConf, previewUrl) {
   if (!dxOrg) return null;
   const prefix = UE_PREFIX.replace('{{DX_ORG}}', dxOrg);
   // TODO: INFRA
-  let ueDomain = previewUrl.replace('https://', '').replace('.aem.', '.ue.da.');
-  ueDomain = window.location.origin === 'https://da.page' ? ueDomain.replace('.ue.da.live', '.ue.da.page') : ueDomain;
+  let ueDomain = previewUrl.replace('https://', '').replace('.entmseds.', '.ue.entmseds-da.');
+  ueDomain = window.location.origin === 'https://entmseds-da.page' ? ueDomain.replace('.ue.entmseds-da.live', '.ue.entmseds-da.page') : ueDomain;
   return `${prefix}${ueDomain}`;
 }
 
 export async function getQeUrl(previewUrl) {
   const finalUrl = previewUrl
-    .replace('.aem.live', '.aem.page')
+    .replace('.entmseds.live', '.entmseds.page')
     .replace(/\/index$/, '/');
   return `${finalUrl}?quick-edit=on`;
 }

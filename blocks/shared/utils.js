@@ -1,9 +1,17 @@
 import { DA_ORIGIN, CON_ORIGIN, DA_ETC_ORIGIN, getLivePreviewUrl, AEM_ORIGIN } from './constants.js';
 import { getNx, getNx2Api } from '../../scripts/utils.js';
 
-const DA_ORIGINS = ['https://da.live', 'https://da.page', 'https://admin.da.live', 'https://admin.da.page', 'https://stage-admin.da.live', 'https://content.da.live', 'http://localhost:8787'];
-const AEM_ORIGINS = ['https://admin.hlx.page', 'https://admin.aem.live'];
-const ETC_ORIGINS = ['https://stage-content.da.live', 'https://helix-snapshot-scheduler-ci.adobeaem.workers.dev', 'https://helix-snapshot-scheduler-prod.adobeaem.workers.dev'];
+// const DA_ORIGINS = ['https://entmseds-da.live', 'https://da.page', 'https://admin.entmseds-da.live', 'https://admin.da.page', 'https://stage-admin.entmseds-da.live', 'https://content.entmseds-da.live', 'http://localhost:8787'];
+const DA_ORIGINS = [
+  'https://entmseds-da.live', // PROD
+  'https://entmseds-da.page', // PROD
+  'https://admin.entmseds-da.live', // PROD
+  'https://admin.entmseds-da.page', // PROD
+  'https://content.entmseds-da.live', // PROD
+  'http://localhost:8787'];
+
+const AEM_ORIGINS = [AEM_ORIGIN, `https://admin.${AEM_HOST_LIVE}`];
+const ETC_ORIGINS = ['https://stage-content.entmseds-da.live', 'https://helix-snapshot-scheduler-ci.adobeaem.workers.dev', 'https://helix-snapshot-scheduler-prod.adobeaem.workers.dev'];
 const ALLOWED_TOKEN = [...DA_ORIGINS, ...AEM_ORIGINS, ...ETC_ORIGINS];
 
 let imsDetails;
