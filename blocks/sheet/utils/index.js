@@ -1,9 +1,23 @@
-import { getNx, getNx2Api, nxJS } from '../../../scripts/utils.js';
+import { getNx, getNx2Api } from '../../../scripts/utils.js';
 import { handleSave, staleCheck } from './utils.js';
 import '../da-sheet-tabs.js';
 
-const { loadStyle } = await import(`${getNx()}${nxJS}`);
-const loadScript = (await import(`${getNx()}/utils/script.js`)).default;
+const nx = getNx();
+const isNx2 = nx.endsWith('/nx2');
+const { loadStyle } = await import(`${nx}/utils/utils.js`);
+// TODO: remove the ternary and the nx v1 branch once nxver=2 is rolled
+// out on the CDN. Kept for backward compat during the transition:
+// nx v1 exposes loadScript at utils/script.js; nx2 re-exports it from
+// utils/utils.js.
+const loadScript = isNx2
+  ? (await import(`${nx}/utils/utils.js`)).loadScript
+  : (await import(`${nx}/utils/script.js`)).default;
+
+async function adoptStyle(href) {
+  const sheet = await loadStyle(href);
+  if (!sheet || document.adoptedStyleSheets.includes(sheet)) return;
+  document.adoptedStyleSheets = [...document.adoptedStyleSheets, sheet];
+}
 
 const SHEET_TEMPLATE = { minDimensions: [20, 20], sheetName: 'data' };
 
@@ -23,9 +37,14 @@ function finishSetup(el, data) {
   el.jexcel.forEach((sheet, idx) => {
     sheet.name = data[idx].sheetName;
     sheet.options.onbeforepaste = (_el, pasteVal) => pasteVal?.trim();
-    sheet.options.onafterchanges = () => {
-      handleSave(el.jexcel, el.details.view);
-    };
+    const save = () => handleSave(el.jexcel, el.details.view);
+    sheet.options.onafterchanges = save;
+    // onafterchanges doesn't fire for these; inserts are skipped since they start empty
+    // and get saved once onafterchanges fires on their content. onmovecolumn is left
+    // unbound - columnDrag is off, so there's no UI path that can ever fire it.
+    sheet.options.ondeleterow = save;
+    sheet.options.ondeletecolumn = save;
+    sheet.options.onmoverow = save;
   });
 
   // Setup tabs
@@ -89,15 +108,18 @@ export async function getData(input) {
   const { config, source, versions } = await getNx2Api();
   const { org, site, path, view, versionId } = input;
 
+  // Version snapshots are immutable; only live-file reads need to wait for our own writes.
+  if (!versionId) await staleCheck.awaitPendingSave();
+
   let resp;
   let isVersion = false;
   if (versionId) {
     isVersion = true;
     resp = await versions.get({ org, site, path, versionId });
   } else if (view === 'config') {
-    resp = await config.get({ org, site });
+    resp = await config.get({ org, site, cachebust: true });
   } else {
-    resp = await source.get({ org, site, path });
+    resp = await source.get({ org, site, path, cachebust: true });
   }
 
   // Set permissions even if the file is a 404
@@ -115,7 +137,7 @@ export async function getData(input) {
   const json = await resp.json();
 
   if (!isVersion) {
-    staleCheck.markSynced(json);
+    staleCheck.markSynced(resp.headers.get('etag'));
     const sheetPanes = document.querySelector('da-sheet-panes');
     if (sheetPanes) sheetPanes.data = json;
   }
@@ -146,7 +168,7 @@ export async function getData(input) {
 export default async function init(el, data) {
   const suppliedData = data || await getData(el.details);
 
-  await loadStyle('/deps/jspreadsheet-ce/dist/jspreadsheet.css');
+  await adoptStyle('/deps/jspreadsheet-ce/dist/jspreadsheet.css');
   await loadScript('/deps/jspreadsheet-ce/dist/index.js');
   await loadScript('/deps/jsuites/dist/jsuites.js');
 

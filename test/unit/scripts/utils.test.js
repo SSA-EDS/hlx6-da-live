@@ -4,7 +4,7 @@ import { setNx, sanitizePath, sanitizePathParts, sanitizeName } from '../../../s
 describe('Libs', () => {
   it('Default Libs', () => {
     const libs = setNx('/nx');
-    expect(libs).to.equal('https://main--hlx6-da-nx--ssa-eds.entmseds.live/nx');
+    expect(libs).to.equal('https://main--da-nx--adobe.aem.live/nx');
   });
 
   it('Default NX on production / CDN', () => {
@@ -19,7 +19,7 @@ describe('Libs', () => {
       search: '?nx=foo',
     };
     const libs = setNx('/nx', location);
-    expect(libs).to.equal('https://foo--hlx6-da-nx--ssa-eds.entmseds.live/nx');
+    expect(libs).to.equal('https://foo--da-nx--adobe.aem.live/nx');
   });
 
   it('Supports NX query param', () => {
@@ -28,7 +28,7 @@ describe('Libs', () => {
       search: '?nx=foo',
     };
     const libs = setNx('/nx', location);
-    expect(libs).to.equal('https://foo--hlx6-da-nx--ssa-eds.entmseds.live/nx');
+    expect(libs).to.equal('https://foo--da-nx--adobe.aem.live/nx');
   });
 
   it('Supports local NX query param', () => {

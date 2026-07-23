@@ -1,9 +1,7 @@
 mountpoints:
   /:
-    url: https://content.entmseds-da.live/ssa-eds/hlx6-da-live/
+    url: https://content.da.live/adobe/da-live/
     type: markup
 
 folders:
   /app/: /apps/custom/shell
-
-  # comment

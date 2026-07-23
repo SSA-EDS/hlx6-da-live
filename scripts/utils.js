@@ -10,8 +10,6 @@
  * governing permissions and limitations under the License.
  */
 
-import { AEM_HOST_PAGE, AEM_HOST_LIVE } from '../blocks/shared/constants.js';
-
 export function sanitizeName(name, preserveDots = true, allowUnderscores = true) {
   if (!name) return null;
 
@@ -65,8 +63,7 @@ export const [setNx, getNx] = (() => {
       nx = (() => {
         const { hostname, search } = location || window.location;
         const nxBaseParam = sanitizeName(new URLSearchParams(search).get('nx'));
-        const aemHostInfix = `.${AEM_HOST_PAGE.slice(0, -5)}.`;
-        const isProd = !(hostname.includes('.aem.') || hostname.includes(aemHostInfix) || hostname.includes('local'));
+        const isProd = !(hostname.includes('.aem.') || hostname.includes('local'));
 
         // If no custom nexter branch & on prod, use the default CDN route
         if (!nxBaseParam && isProd) return nxVerBase;
@@ -78,7 +75,7 @@ export const [setNx, getNx] = (() => {
         if (branch === 'local') return `http://localhost:6456${nxVerBase}`;
 
         // Otherwise use a fully qualified branch
-        return `https://${branch}--hlx6-da-nx--ssa-eds.${AEM_HOST_LIVE}${nxVerBase}`;
+        return `https://${branch}--da-nx--adobe.aem.live${nxVerBase}`;
       })();
       return nx;
     }, () => nx,
