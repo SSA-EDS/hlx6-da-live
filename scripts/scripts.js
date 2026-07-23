@@ -49,12 +49,12 @@ link.setAttribute('href', `${nx}${nxCSS}`);
 document.head.appendChild(link);
 
 const CONFIG = {
-  hostnames: ['da.live', 'da.page'],
+  hostnames: ['entmseds-da.live', 'entmseds-da.page'],
   codeBase: import.meta.url.replace('/scripts/scripts.js', ''),
   providers: { da: window.location.origin },
   decorateArea,
-  imsClientId: 'darkalley',
-  imsScope: 'ab.manage,AdobeID,gnav,openid,org.read,read_organizations,session,aem.frontend.all,additional_info.ownerOrg,additional_info.projectedProductContext,account_cluster.read',
+  imsClientId: 'ssa-eds',
+  imsScope: 'ab.manage,AdobeID,gnav,openid,org.read,read_organizations,session,additional_info.ownerOrg,additional_info.projectedProductContext,account_cluster.read',
 };
 
 export default async function loadPage() {
