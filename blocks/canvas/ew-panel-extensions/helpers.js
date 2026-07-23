@@ -258,6 +258,13 @@ export async function fetchExtensions(org, site) {
   return extensions;
 }
 
+/** Resolve the configured "blocks" library extension for an org/site, or null. */
+export async function getBlocksExtension(org, site) {
+  if (!org || !site) return null;
+  const extensions = await fetchExtensions(org, site);
+  return extensions?.find((ext) => ext.name === 'blocks') || null;
+}
+
 // ---------------------------------------------------------------------------
 // Data fetching
 // ---------------------------------------------------------------------------
@@ -279,6 +286,38 @@ export async function fetchBlocks(sources) {
     } catch { /* skip failed source */ }
   }
   return blocks;
+}
+
+const blockLibraryCache = new Map();
+
+/**
+ * Load — and memoize per org/site — the configured blocks library: the resolved
+ * "blocks" extension plus its fetched blocks (each carrying a lazy `loadVariants`
+ * promise). Shared by the slash-menu prefetch and the block-library modal so the
+ * library (and every variant's HTML) is fetched and parsed at most once.
+ * Resolves to `{ ext: null, blocks: [] }` when no library is configured.
+ */
+export function loadBlockLibrary(org, site) {
+  if (!org || !site) return Promise.resolve({ ext: null, blocks: [] });
+  const key = `${org}/${site}`;
+  if (!blockLibraryCache.has(key)) {
+    const pending = (async () => {
+      const ext = await getBlocksExtension(org, site);
+      if (!ext) return { ext: null, blocks: [] };
+      const blocks = await fetchBlocks(ext.sources);
+      return { ext, blocks };
+    })().catch((err) => {
+      // Don't cache transient failures — allow a later retry.
+      blockLibraryCache.delete(key);
+      throw err;
+    });
+    blockLibraryCache.set(key, pending);
+  }
+  return blockLibraryCache.get(key);
+}
+
+export function resetBlockLibraryCache() {
+  blockLibraryCache.clear();
 }
 
 export async function fetchItems(sources, format) {
@@ -418,7 +457,42 @@ function createFileExplorerView() {
   };
 }
 
-function extensionToPanelView(ext, section) {
+function createVersioningView() {
+  return {
+    id: 'versions',
+    label: 'Versions',
+    section: 'Editor',
+    firstParty: true,
+    load: async () => {
+      await import('../ew-canvas-versions/ew-canvas-versions.js');
+      return document.createElement('ew-canvas-versions');
+    },
+  };
+}
+
+export function extensionToPanelView(ext, section) {
+  // Block library opens its own dedicated modal (used by the slash menu and
+  // outline "+" button) rather than the generic inline panel or iframe dialog.
+  if (ext.name === 'blocks') {
+    return {
+      id: ext.name,
+      label: ext.title,
+      section,
+      firstParty: ext.ootb,
+      experience: 'modal',
+      icon: ext.icon,
+      openModal: async () => {
+        const { openBlockLibraryModal } = await import('../ew-block-library-modal/ew-block-library-modal.js');
+        openBlockLibraryModal({
+          onInsert: (dom) => {
+            const { view } = getExtensionsBridge();
+            if (view) insertBlock(view, dom);
+          },
+        });
+      },
+    };
+  }
+
   const view = {
     id: ext.name,
     label: ext.title,
@@ -440,7 +514,7 @@ function extensionToPanelView(ext, section) {
       if (ext.name === 'aem-assets') {
         const { renderAssets } = await import('./aem-assets.js');
         await renderAssets({ container, org: ext.org, site: ext.site, onClose });
-        return () => {};
+        return () => { };
       }
 
       const iframe = document.createElement('iframe');
@@ -450,7 +524,7 @@ function extensionToPanelView(ext, section) {
       iframe.allow = 'clipboard-write *';
       container.append(iframe);
 
-      let destroyChannel = () => {};
+      let destroyChannel = () => { };
       iframe.addEventListener('load', async () => {
         let hashState;
         const unsub = hashChange.subscribe((s) => { hashState = s; });
@@ -478,13 +552,13 @@ function extensionToPanelView(ext, section) {
  */
 export async function getCanvasToolPanelViews({ org, site }) {
   const extensions = await fetchExtensions(org, site);
-  const library = sortLibraryExtensions(extensions.filter(isLibraryExtension))
-    .filter((ext) => ext.name !== 'blocks');
+  const library = sortLibraryExtensions(extensions.filter(isLibraryExtension));
   const thirdParty = extensions.filter((ext) => !isLibraryExtension(ext));
 
   return [
     createOutlineView(),
     createFileExplorerView(),
+    createVersioningView(),
     ...library.map((ext) => extensionToPanelView(ext, 'Library')),
     ...thirdParty.map((ext) => extensionToPanelView(ext, 'Extensions')),
   ];

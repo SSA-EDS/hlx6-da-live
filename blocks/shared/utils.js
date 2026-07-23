@@ -1,16 +1,8 @@
-import { DA_ORIGIN, CON_ORIGIN, DA_ETC_ORIGIN, getLivePreviewUrl, AEM_ORIGIN, AEM_HOST_LIVE } from './constants.js';
+import { DA_ORIGIN, CON_ORIGIN, DA_ETC_ORIGIN, getLivePreviewUrl, AEM_ORIGIN } from './constants.js';
 import { getNx, getNx2Api } from '../../scripts/utils.js';
 
-// const DA_ORIGINS = ['https://da.live', 'https://da.page', 'https://admin.da.live', 'https://admin.da.page', 'https://stage-admin.da.live', 'https://content.da.live', 'http://localhost:8787'];
-const DA_ORIGINS = [
-  'https://entmseds-da.live', // PROD
-  'https://entmseds-da.page', // PROD
-  'https://admin.entmseds-da.live', // PROD
-  'https://admin.entmseds-da.page', // PROD
-  'https://content.entmseds-da.live', // PROD
-  'http://localhost:8787'];
-
-const AEM_ORIGINS = [AEM_ORIGIN, `https://admin.${AEM_HOST_LIVE}`];
+const DA_ORIGINS = ['https://da.live', 'https://da.page', 'https://admin.da.live', 'https://admin.da.page', 'https://stage-admin.da.live', 'https://content.da.live', 'http://localhost:8787'];
+const AEM_ORIGINS = ['https://admin.hlx.page', 'https://admin.aem.live'];
 const ETC_ORIGINS = ['https://stage-content.da.live', 'https://helix-snapshot-scheduler-ci.adobeaem.workers.dev', 'https://helix-snapshot-scheduler-prod.adobeaem.workers.dev'];
 const ALLOWED_TOKEN = [...DA_ORIGINS, ...AEM_ORIGINS, ...ETC_ORIGINS];
 
@@ -83,7 +75,7 @@ export const daFetch = async (url, opts = {}) => {
   let resp = await fetch(url, opts);
 
   if (resp.status === 401 && opts.noRedirect !== true
-      && DA_ORIGINS.some((origin) => url.startsWith(origin))) {
+    && DA_ORIGINS.some((origin) => url.startsWith(origin))) {
     // Silent recovery: another tab may have just refreshed/signed in. Ask imslib
     // for a fresh token and retry once before any user-visible disruption.
     let refreshed = null;
@@ -140,7 +132,7 @@ export async function aemAdmin(path, api, method = 'POST') {
   const [owner, repo, ...parts] = path.slice(1).split('/');
   const name = parts.pop() || repo || owner;
   parts.push(name.replace('.html', ''));
-  const aemUrl = `${AEM_ORIGIN}/${api}/${owner}/${repo}/main/${parts.join('/')}`;
+  const aemUrl = `https://admin.hlx.page/${api}/${owner}/${repo}/main/${parts.join('/')}`;
   const resp = await daFetch(aemUrl, { method });
   if (method === 'DELETE' && resp.status === 204) return {};
   if (!resp.ok) return undefined;
@@ -149,6 +141,93 @@ export async function aemAdmin(path, api, method = 'POST') {
   } catch {
     return undefined;
   }
+}
+
+/* eslint-disable max-len */
+/**
+ * [admin] Unable to preview '.../page.md': source contains large image: error fetching resource at http.../hello: Image 1 exceeds allowed limit of 10.00MB
+ * [admin] Unable to preview '.../doc.pdf': PDF is larger than 10MB: 24.0MB
+ * [admin] Unable to preview '.../video.mp4': MP4 is longer than 2 minutes: 2m 44s
+ * [admin] Unable to preview '.../video.mp4': MP4 has a higher bitrate than 300 KB/s: 494 kilobytes
+ * [admin] not authenticated
+ * [admin] not authorized
+ */
+/* eslint-enable max-len */
+export function parseAemError(xError) {
+  if (xError.includes('PDF')) {
+    const [seg1, seg2] = xError.split(': ').slice(-2);
+    return `${seg1}: ${seg2}`;
+  }
+  if (xError.includes('MP4')) {
+    const [seg1] = xError.split(': ').slice(-2);
+    return seg1;
+  }
+  if (xError.includes('Image')) {
+    return xError.split(': ').pop().replace('.00', '');
+  }
+  return xError.replace('[admin] ', '');
+}
+
+// `action` is the admin API namespace: 'preview' or 'live' (the latter is the
+// admin API's name for publish). Routes through nx's `aem` API, which detects
+// HLX6 vs legacy (via isHlx6) and calls the correct endpoint for the org/site.
+export async function saveToAem(path, action) {
+  const { aem } = await getNx2Api();
+  const aemPath = path.toLowerCase();
+  const call = action === 'live' ? aem.publish : aem.preview;
+  const resp = await call(aemPath);
+  if (!resp.ok) {
+    const { status, headers } = resp;
+    const authErr = [401, 403].some((s) => s === status);
+    const message = authErr ? `Not authorized to ${action}` : `Error during ${action}`;
+    const xerror = headers.get('x-error');
+    const error = { action, status, type: 'error', message };
+    if (xerror && !authErr) error.details = parseAemError(xerror);
+    return { error };
+  }
+  return resp.json();
+}
+
+const SNAPSHOT_SCHEDULER_URL = 'https://helix-snapshot-scheduler-prod.adobeaem.workers.dev';
+
+export async function getExistingSchedule(org, site, path) {
+  try {
+    const resp = await daFetch(`${SNAPSHOT_SCHEDULER_URL}/schedule/${org}/${site}?path=${encodeURIComponent(path)}`);
+    if (!resp.ok) return null;
+    return resp.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function saveDaVersion(pathname, label = 'Published') {
+  try {
+    const { versions } = await getNx2Api();
+    await versions.create(pathname, { comment: label });
+  } catch {
+    // eslint-disable-next-line no-console
+    console.log(`Error creating auto version (${label}).`);
+  }
+}
+
+export async function aemAction(path, action, opts = {}) {
+  const previewJson = await saveToAem(path, 'preview');
+  if (previewJson.error) return previewJson;
+  if (action === 'preview') return previewJson;
+
+  if (!opts.skipSchedule) {
+    const [, org, site, ...rest] = path.toLowerCase().split('/');
+    const pagePath = `/${rest.join('/')}`.replace(/\.html$/, '');
+    const schedule = await getExistingSchedule(org, site, pagePath);
+    if (schedule?.scheduled) {
+      const proceed = opts.onScheduled ? await opts.onScheduled(schedule) : false;
+      if (!proceed) return { cancelled: true };
+    }
+  }
+
+  const liveJson = await saveToAem(path, 'live');
+  if (liveJson.error) return { ...liveJson, error: { ...liveJson.error, action: 'publish' } };
+  return liveJson;
 }
 
 export async function saveToDa({ path, formData, blob, props, preview = false }) {
@@ -184,6 +263,16 @@ export const getSheetByName = (json, name) => {
 };
 
 export const getFirstSheet = (json) => getSheetByIndex(json, 0);
+
+export function getPostMessageTargetOrigin(url, fallback = '/') {
+  try {
+    return new URL(url, window.location.href).origin;
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(`Could not determine postMessage target origin for "${url}"`, e);
+    return fallback;
+  }
+}
 
 export async function contentLogin(owner, repo) {
   try {

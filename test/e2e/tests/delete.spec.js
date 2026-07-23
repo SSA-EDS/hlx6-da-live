@@ -14,13 +14,13 @@ import ENV from '../utils/env.js';
 import {
   getQuery, getTestPageURL, getTestResourceAge, tabBackward, fill, TEST_ORG, TEST_SITE,
 } from '../utils/page.js';
+import { dismissAlertBanner } from '../utils/utils.js';
 
 // Files are deleted after 2 hours by default
 const MIN_HOURS = process.env.PW_DELETE_HOURS ? Number(process.env.PW_DELETE_HOURS) : 2;
 
 // This test deletes old testing pages that are older than 2 hours
 test('Delete multiple old pages', async ({ page }, workerInfo) => {
-  test.skip(TEST_SITE !== 'da-status', 'Deleting documents doesn\'t work yet in Helix 6');
   if (workerInfo.project.name !== 'chromium') {
     // only execute this test on chromium
     return;
@@ -36,6 +36,8 @@ test('Delete multiple old pages', async ({ page }, workerInfo) => {
 
   // This page will always be there as its used by a test
   await expect(page.getByText('pingtest'), 'Precondition').toBeVisible();
+
+  await dismissAlertBanner(page);
 
   // List the resources and check fot the ones that are to be deleted. These are always pages
   // created by the getTestPageURL() function in page.js
@@ -76,7 +78,7 @@ test('Delete multiple old pages', async ({ page }, workerInfo) => {
   }
 
   // Hit the delete button
-  await page.locator('button.delete-button').locator('visible=true').click();
+  await page.locator('button.delete-button').filter({ visible: true }).click();
 
   // Type in YES to delete > 10 items
   if (itemsToDelete > 10) {
@@ -84,10 +86,12 @@ test('Delete multiple old pages', async ({ page }, workerInfo) => {
   }
 
   // Hit the delete confirmation button
-  await page.locator('sl-button.negative').locator('visible=true').click();
+  await page.locator('sl-button.negative').filter({ visible: true }).click();
 
   // Wait for the delete button to disappear which is when we're done
-  await expect(page.locator('button.delete-button').locator('visible=true')).not.toBeVisible({ timeout: 600000 });
+  await expect(page.locator('button.delete-button').filter({ visible: true })).not.toBeVisible({ timeout: 600000 });
+
+  console.log('Deleted', itemsToDelete, 'test files and folders');
 });
 
 test('Empty out open editors on deleted documents', async ({ browser, page }, workerInfo) => {
@@ -127,13 +131,14 @@ test('Empty out open editors on deleted documents', async ({ browser, page }, wo
   await tabBackward(list);
   await list.keyboard.press(' ');
   await list.waitForTimeout(500);
-  await list.locator('button.delete-button').locator('visible=true').click();
+  await dismissAlertBanner(list);
+  await list.locator('button.delete-button').filter({ visible: true }).click();
 
   // Give the modal a chance to open
   await list.waitForTimeout(1000);
 
   // Hit the delete confirmation button
-  await list.locator('sl-button.negative').locator('visible=true').click();
+  await list.locator('sl-button.negative').filter({ visible: true }).click();
 
   // The open window should be cleared out now
   await expect(page2.locator('div.ProseMirror')).not.toBeVisible();

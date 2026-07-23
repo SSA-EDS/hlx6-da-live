@@ -1,6 +1,5 @@
 import { LitElement, html, nothing } from 'da-lit';
 import { getNx, sanitizeName } from '../../../scripts/utils.js';
-import { AEM_HOST_PAGE } from '../../shared/constants.js';
 
 const { loadStyle } = await import(`${getNx()}/utils/utils.js`);
 const styles = await loadStyle(import.meta.url);
@@ -123,7 +122,7 @@ export default class DaSites extends LitElement {
             @change="${() => { this._urlError = false; }}" 
             type="text" name="siteUrl" 
             aria-label="Site URL"
-            placeholder="${`https://main--site--org.${AEM_HOST_PAGE}`}"
+            placeholder="https://main--site--org.aem.page" 
             class="${this._urlError ? 'error' : nothing}" 
         />
         <div class="da-form-btn-offset">
@@ -160,11 +159,11 @@ export default class DaSites extends LitElement {
           </div>
           <div class="da-site-back">
             <button class="da-back-action" @click=${() => this.handleShare(site.name)}>
-              <img src="/blocks/browse/da-sites/img/s2-share.svg" loading="lazy"/>
+              <img src="/img/icons/s2-icon-share-20-n.svg" loading="lazy"/>
               <span>Share</span>
             </button>
             <button class="da-back-action" @click=${() => this.handleRemove(site)}>
-              <img src="/blocks/browse/da-sites/img/s2-visibility-off.svg" loading="lazy"/>
+              <img src="/img/icons/s2-icon-visibilityoff-20-n.svg" loading="lazy"/>
               <span>Hide</span>
             </button>
           </div>

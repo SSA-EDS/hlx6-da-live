@@ -16,9 +16,6 @@ function getEnv() {
   if (branch === 'main' && owner === 'adobe') {
     return 'https://da.live';
   }
-  if branch === 'main' && owner === 'ams-eds' {
-    return `https://ssa-da.live`;
-  }
   return `https://${branch}--da-live--${owner}.aem.live`;
 }
 

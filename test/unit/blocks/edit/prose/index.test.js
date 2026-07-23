@@ -7,7 +7,7 @@ import initProse, {
   createConnection,
   createAwarenessStatusWidget,
 } from '../../../../../blocks/edit/prose/index.js';
-import { forceSave } from '../../../../../blocks/edit/prose/forcesave.js';
+import { forceSave } from '../../../../../blocks/shared/forcesave.js';
 
 // initProse lazily imports da-library.js, which (a) builds URLs from
 // `${getNx()}/...` and (b) calls loadLibrary() at module import time.
@@ -98,8 +98,8 @@ describe('prose/index createConnection', () => {
     expect(result.wsProvider).to.exist;
     expect(result.ydoc).to.exist;
     expect(result.wsProvider.maxBackoffTime).to.equal(30000);
-    // Legacy (non-hlx6) docs get the DA_ORIGIN collab room, not the input origin.
-    expect(result.wsProvider.roomname).to.equal('https://admin.entmseds-da.live/source/org/repo/page.html');
+    // Legacy (non-hlx6) docs keep the admin.da.live collab room.
+    expect(result.wsProvider.roomname).to.equal('https://admin.da.live/source/org/repo/page.html');
     // Clean up the underlying WS connection
     result.wsProvider.disconnect({ data: 'Client navigation' });
     result.wsProvider.destroy?.();

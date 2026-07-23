@@ -1,6 +1,4 @@
-export const AEM_HOST_PAGE = "entmseds.page";
-export const AEM_HOST_LIVE = "entmseds.live";
-export const AEM_ORIGIN = `https://admin.${AEM_HOST_PAGE}`;
+export const AEM_ORIGIN = 'https://admin.hlx.page';
 
 export const SUPPORTED_FILES = {
   html: 'text/html',
@@ -17,28 +15,26 @@ export const SUPPORTED_FILES = {
 
 const DA_ADMIN_ENVS = {
   local: 'http://localhost:8787',
-  // stage: 'https://stage-admin.da.live',
-  // prod: 'https://admin.da.live',
-  stage: 'https://admin.entmseds-da.live',
-  prod: 'https://admin.entmseds-da.live',
+  stage: 'https://stage-admin.da.live',
+  prod: 'https://admin.da.live',
 };
 
 const DA_COLLAB_ENVS = {
   local: 'ws://localhost:4711',
-  stage: 'wss://collab.entmseds-da.live',
-  prod: 'wss://collab.entmseds-da.live',
+  stage: 'wss://stage-collab.da.live',
+  prod: 'wss://collab.da.live',
 };
 
 const DA_CONTENT_ENVS = {
   local: 'http://localhost:8788',
-  stage: 'https://stage-content.entmseds-da.live',
-  prod: 'https://content.entmseds-da.live',
+  stage: 'https://stage-content.da.live',
+  prod: 'https://content.da.live',
 };
 
 const DA_LIVE_PREVIEW_ENVS = {
   local: 'localhost:8000',
-  stage: 'stage-preview.entmseds-da.live',
-  prod: 'preview.entmseds-da.live',
+  stage: 'stage-preview.da.live',
+  prod: 'preview.da.live',
 };
 
 const DA_ETC_ENVS = {
@@ -55,7 +51,8 @@ function getDaEnv(location, key, envs) {
     localStorage.setItem(key, query);
   }
   const env = envs[localStorage.getItem(key) || 'prod'];
-  return location.origin === 'https://entmseds-da.page' ? env.replace('.live', '.page') : env;
+  // TODO: INFRA
+  return location.origin === 'https://da.page' ? env.replace('.live', '.page') : env;
 }
 
 export const getDaAdmin = (() => {
