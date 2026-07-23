@@ -1,4 +1,4 @@
-import { SUPPORTED_FILES, AEM_HOST_PAGE } from '../../../shared/constants.js';
+import { SUPPORTED_FILES } from '../../../shared/constants.js';
 import { getNx2Api, sanitizePath, sanitizePathParts } from '../../../../scripts/utils.js';
 
 const MAX_DEPTH = 1000;
@@ -142,7 +142,7 @@ export function items2Clipboard(items) {
       const pageName = pathParts.pop();
       pathParts.push(pageName === 'index' ? '' : pageName);
 
-      const url = `https://main--${site}--${org}.${AEM_HOST_PAGE}/${pathParts.join('/')}`;
+      const url = `https://main--${site}--${org}.aem.page/${pathParts.join('/')}`;
       const toPush = item.message ? `${url} - ${item.message}` : url;
 
       acc.push(toPush);

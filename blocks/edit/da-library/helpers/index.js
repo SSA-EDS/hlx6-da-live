@@ -1,9 +1,8 @@
 import { daFetch, getFirstSheet, getSheetByName } from '../../../shared/utils.js';
 import { getMetadata } from '../../utils/helpers.js';
 import { parseDom, aemToContentUrl, daFetchLibrary } from './helpers.js';
-import { AEM_HOST_PAGE, AEM_HOST_LIVE } from '../../../shared/constants.js';
 
-const AEM_DOMAIN_SUFFIXES = ['hlx.page', 'hlx.live', 'aem.page', 'aem.live', 'gov-aem.page', 'gov-aem.live', AEM_HOST_PAGE, AEM_HOST_LIVE];
+const AEM_ORIGIN = ['hlx.page', 'hlx.live', 'aem.page', 'aem.live'];
 
 function isHeading(element) {
   return ['H1', 'H2', 'H3', 'H4', 'H5', 'H6'].some((name) => element?.nodeName === name);
@@ -73,7 +72,7 @@ function getBlockTableHtml(block) {
 function isAemHosted(path) {
   try {
     const { origin } = new URL(path);
-    return AEM_DOMAIN_SUFFIXES.some((aemOrigin) => origin.endsWith(aemOrigin));
+    return AEM_ORIGIN.some((aemOrigin) => origin.endsWith(aemOrigin));
   } catch {
     return false;
   }

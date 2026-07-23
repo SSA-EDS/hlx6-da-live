@@ -2,6 +2,10 @@
   --ew-canvas-header-height: 48px;
 }
 
+.light-scheme, .dark-scheme {
+  color-scheme: light;
+}
+
 html:has(aside.panel[data-position="before"]:not([hidden])) ew-canvas-header::part(toggle-before) {
   display: none;
 }
@@ -33,14 +37,14 @@ nx-chat {
   flex: 1;
   min-height: 0;
   gap: 0;
-  height: calc(100vh - var(--ew-canvas-header-height) - var(--s2-nav-height));
+  height: calc(100vh - var(--ew-canvas-header-height) - var(--s2-nav-height) - 2px);
 }
 
 ew-editor-doc {
   display: block;
   flex: 1;
   min-height: 0;
-  max-height: calc(100vh - var(--ew-canvas-header-height) - var(--s2-nav-height));
+  max-height: calc(100vh - var(--ew-canvas-header-height) - var(--s2-nav-height) - 2px);
   overflow-y: auto;
 }
 

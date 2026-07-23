@@ -1,4 +1,4 @@
-import { CON_ORIGIN, DA_ORIGIN, AEM_HOST_LIVE } from './constants.js';
+import { CON_ORIGIN, DA_ORIGIN } from './constants.js';
 import { sanitizePathParts } from '../../scripts/utils.js';
 
 let currpath;
@@ -51,7 +51,7 @@ function getRepoDetails({ editor, pathParts, ext }) {
     parent,
     parentName,
     sourceUrl: `${DA_ORIGIN}/${daApi}/${path}`,
-    previewUrl: `https://main--${repo}--${org}.${AEM_HOST_LIVE}`,
+    previewUrl: `https://main--${repo}--${org}.aem.live`,
     contentUrl: `${CON_ORIGIN}/${fullPath}`,
   };
 }
@@ -83,7 +83,7 @@ function getFullDetails({ editor, pathParts, ext }) {
     parent: ext === null ? `${parent}/${name}` : parent,
     parentName: ext === null ? name : parentName,
     sourceUrl: `${DA_ORIGIN}/${daApi}/${path}`,
-    previewUrl: `https://main--${repo}--${org}.${AEM_HOST_LIVE}${pathname}`,
+    previewUrl: `https://main--${repo}--${org}.aem.live${pathname}`,
     contentUrl: `${CON_ORIGIN}/${fullPath}`,
   };
 }

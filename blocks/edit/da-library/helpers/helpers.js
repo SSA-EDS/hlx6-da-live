@@ -2,7 +2,7 @@
 import { DOMParser } from 'da-y-wrapper';
 import getPathDetails from '../../../shared/pathDetails.js';
 import { daFetch, fetchDaConfigs, getFirstSheet, getSheetByName } from '../../../shared/utils.js';
-import { CON_ORIGIN, AEM_HOST_PAGE, AEM_HOST_LIVE } from '../../../shared/constants.js';
+import { CON_ORIGIN } from '../../../shared/constants.js';
 import { openAssets } from '../../da-assets/da-assets.js';
 import { fetchKeyAutocompleteData } from '../../prose/plugins/slashMenu/keyAutocomplete.js';
 import { getNx2Api, sanitizeName } from '../../../../scripts/utils.js';
@@ -45,7 +45,7 @@ function setupBlockOptions(library) {
   if (blockJsonUrl) fetchKeyAutocompleteData(blockJsonUrl);
 }
 
-const AEM_CONTENT_HOST = /\.(ent-)?(aem|hlx)\.(page|live)$/;
+const AEM_CONTENT_HOST = /\.(aem|hlx)\.(page|live)$/;
 
 export function aemToContentUrl(url) {
   try {
@@ -131,7 +131,7 @@ function calculateSources(org, repo, sheetPath) {
     if (ref === 'local') return `http://localhost:3000${path}`;
 
     // Fallback to the ref in search param (defaults to main)
-    return `https://${ref}--${repo}--${org}.${AEM_HOST_LIVE}${path}`;
+    return `https://${ref}--${repo}--${org}.aem.live${path}`;
   });
 }
 
@@ -233,13 +233,13 @@ export function getPreviewUrl(previewUrl) {
     const url = new URL(previewUrl);
 
     if (url.origin.includes('--')) return url.href;
-    if (url.origin.includes('content.entmseds-da.live')) {
+    if (url.origin.includes('content.da.live')) {
       const [, org, site, ...split] = url.pathname.split('/');
-      return `https://${ref}--${site}--${org}.${AEM_HOST_PAGE}/${split.join('/')}`;
+      return `https://${ref}--${site}--${org}.aem.page/${split.join('/')}`;
     }
-    if (url.origin.includes('admin.entmseds-da.live')) {
+    if (url.origin.includes('admin.da.live')) {
       const [, , org, site, ...split] = url.pathname.split('/');
-      return `https://${ref}--${site}--${org}.${AEM_HOST_PAGE}/${split.join('/')}`;
+      return `https://${ref}--${site}--${org}.aem.page/${split.join('/')}`;
     }
   } catch {
     return false;
@@ -256,11 +256,11 @@ export function getAemUrlVars(url) {
       return [org, site, branch];
     }
 
-    if (urlObj.origin.includes('content.entmseds-da.live')) {
+    if (urlObj.origin.includes('content.da.live')) {
       const [, org, site] = urlObj.pathname.split('/');
       return [org, site, 'main'];
     }
-    if (urlObj.origin.includes('admin.entmseds-da.live')) {
+    if (urlObj.origin.includes('admin.da.live')) {
       const [, , org, site] = urlObj.pathname.split('/');
       return [org, site, 'main'];
     }
@@ -291,7 +291,7 @@ export function getItemDetails(item) {
     return { org, site, pathname };
   }
   // DA Content Flavor
-  if (hostname.includes('content.entmseds-da.live') || hostname.includes('content.da.live')) {
+  if (hostname.includes('content.da.live')) {
     const [org, site, ...rest] = pathname.slice(1).split('/');
     return { org, site, pathname: `/${rest.join('/')}` };
   }

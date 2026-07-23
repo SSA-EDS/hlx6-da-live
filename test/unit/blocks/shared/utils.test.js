@@ -4,7 +4,9 @@ import {
   daFetch,
   etcFetch,
   aemAdmin,
+  aemAction,
   saveToDa,
+  saveDaVersion,
   getSheetByIndex,
   getSheetByName,
   getFirstSheet,
@@ -427,7 +429,7 @@ describe('aemAdmin', () => {
     };
 
     await aemAdmin('/owner/repo/folder/page.html', 'preview');
-    expect(capturedUrl).to.equal('https://admin.entmseds.page/preview/owner/repo/main/folder/page');
+    expect(capturedUrl).to.equal('https://admin.hlx.page/preview/owner/repo/main/folder/page');
   });
 
   it('Strips .html extension from name', async () => {
@@ -521,7 +523,7 @@ describe('getSidekickConfig', () => {
   it('Returns preview and prod when both hosts are available', async () => {
     const org = 'org1';
     const site = 'site1';
-    const configUrl = `https://admin.entmseds.page/sidekick/${org}/${site}/main/config.json`;
+    const configUrl = `https://admin.hlx.page/sidekick/${org}/${site}/main/config.json`;
 
     const mockFetch = (url) => {
       if (url === configUrl) {
@@ -549,7 +551,7 @@ describe('getSidekickConfig', () => {
   it('Returns object when only previewHost is available', async () => {
     const org = 'org2';
     const site = 'site2';
-    const configUrl = `https://admin.entmseds.page/sidekick/${org}/${site}/main/config.json`;
+    const configUrl = `https://admin.hlx.page/sidekick/${org}/${site}/main/config.json`;
 
     const mockFetch = (url) => {
       if (url === configUrl) {
@@ -571,7 +573,7 @@ describe('getSidekickConfig', () => {
   it('Returns object when only host is available', async () => {
     const org = 'org3';
     const site = 'site3';
-    const configUrl = `https://admin.entmseds.page/sidekick/${org}/${site}/main/config.json`;
+    const configUrl = `https://admin.hlx.page/sidekick/${org}/${site}/main/config.json`;
 
     const mockFetch = (url) => {
       if (url === configUrl) {
@@ -593,7 +595,7 @@ describe('getSidekickConfig', () => {
   it('Returns empty object when neither previewHost nor host is available', async () => {
     const org = 'org4';
     const site = 'site4';
-    const configUrl = `https://admin.entmseds.page/sidekick/${org}/${site}/main/config.json`;
+    const configUrl = `https://admin.hlx.page/sidekick/${org}/${site}/main/config.json`;
 
     const mockFetch = (url) => {
       if (url === configUrl) {
@@ -680,6 +682,69 @@ describe('fetchDaConfigs', () => {
     const resolved = await results[0];
     expect(resolved).to.equal(null);
     expect(fetchCalled).to.be.false;
+  });
+});
+
+describe('saveDaVersion', () => {
+  let savedFetch;
+  beforeEach(() => { savedFetch = window.fetch; });
+  afterEach(() => { window.fetch = savedFetch; });
+
+  it('POSTs to the versionsource endpoint with the correct path and label', async () => {
+    let capturedUrl;
+    let capturedOpts;
+    window.fetch = (url, opts) => {
+      capturedUrl = url;
+      capturedOpts = opts;
+      return Promise.resolve(new Response('ok', { status: 200 }));
+    };
+
+    await saveDaVersion('/org/site/doc', 'Previewed');
+    expect(capturedUrl).to.include('/versionsource/org/site/doc');
+    expect(capturedOpts.method).to.equal('POST');
+    expect(JSON.parse(capturedOpts.body)).to.deep.equal({ label: 'Previewed' });
+  });
+
+  it('Silently swallows fetch errors', async () => {
+    window.fetch = () => Promise.reject(new Error('network error'));
+    await saveDaVersion('/org/site/doc', 'Published');
+  });
+});
+
+describe('aemAction', () => {
+  let savedFetch;
+  beforeEach(() => {
+    savedFetch = window.fetch;
+    window.localStorage.removeItem('nx-ims');
+  });
+  afterEach(() => {
+    window.fetch = savedFetch;
+    window.localStorage.removeItem('nx-ims');
+  });
+
+  it('Returns a human-readable error message when the AEM preview fetch fails', async () => {
+    window.fetch = () => Promise.resolve(new Response('forbidden', { status: 403 }));
+
+    const result = await aemAction('/org/site/doc', 'preview');
+    expect(result.error).to.exist;
+    expect(result.error.type).to.equal('error');
+    expect(result.error.message).to.equal('Not authorized to preview');
+  });
+
+  it('Returns cancelled when publish is blocked by onScheduled returning false', async () => {
+    const scheduleJson = { scheduled: true, scheduledPublish: new Date().toISOString() };
+    window.fetch = (url) => {
+      if (url.includes('/preview/')) {
+        return Promise.resolve(new Response(
+          JSON.stringify({ preview: { url: 'https://x.hlx.page/' }, webPath: '/' }),
+          { status: 200 },
+        ));
+      }
+      return Promise.resolve(new Response(JSON.stringify(scheduleJson), { status: 200 }));
+    };
+
+    const result = await aemAction('/org/site/doc', 'publish', { onScheduled: async () => false });
+    expect(result.cancelled).to.be.true;
   });
 });
 
