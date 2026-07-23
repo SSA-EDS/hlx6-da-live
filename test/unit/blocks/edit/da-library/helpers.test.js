@@ -101,13 +101,13 @@ describe('da-library/helpers exports', () => {
         .to.deep.equal(['org', 'repo', 'main']);
     });
 
-    it('Extracts org, site from a content.da.live URL with main branch', () => {
-      expect(getAemUrlVars('https://content.da.live/org/site/folder/page'))
+    it('Extracts org, site from a content.entmseds-da.live URL with main branch', () => {
+      expect(getAemUrlVars('https://content.entmseds-da.live/org/site/folder/page'))
         .to.deep.equal(['org', 'site', 'main']);
     });
 
-    it('Extracts org, site from an admin.da.live URL with main branch', () => {
-      expect(getAemUrlVars('https://admin.da.live/source/org/site/page'))
+    it('Extracts org, site from an admin.entmseds-da.live URL with main branch', () => {
+      expect(getAemUrlVars('https://admin.entmseds-da.live/source/org/site/page'))
         .to.deep.equal(['org', 'site', 'main']);
     });
 
@@ -135,10 +135,10 @@ describe('da-library/helpers exports', () => {
         .to.equal('https://content.entmseds-da.live/org/site/deep/nested/path');
     });
 
-    it('Leaves content.da.live and admin.da.live URLs unchanged', () => {
-      const con = 'https://content.da.live/org/site/blocks/cards';
+    it('Leaves content.entmseds-da.live and admin.entmseds-da.live URLs unchanged', () => {
+      const con = 'https://content.entmseds-da.live/org/site/blocks/cards';
       expect(aemToContentUrl(con)).to.equal(con);
-      const admin = 'https://admin.da.live/source/org/site/blocks/cards';
+      const admin = 'https://admin.entmseds-da.live/source/org/site/blocks/cards';
       expect(aemToContentUrl(admin)).to.equal(admin);
     });
 
@@ -197,14 +197,14 @@ describe('da-library/helpers exports', () => {
       const { resp, usedFallback } = await daFetchLibrary('https://main--repo--org.entmseds.live/page');
       expect(resp.status).to.equal(200);
       expect(usedFallback).to.be.false;
-      expect(calls).to.deep.equal(['https://content.da.live/org/repo/page']);
+      expect(calls).to.deep.equal(['https://content.entmseds-da.live/org/repo/page']);
     });
 
     it('Falls back to the original URL on 404 from the rewrite', async () => {
       const calls = [];
       window.fetch = (url) => {
         calls.push(url);
-        const status = url.startsWith('https://content.da.live/') ? 404 : 200;
+        const status = url.startsWith('https://content.entmseds-da.live/') ? 404 : 200;
         return Promise.resolve(new Response('', { status }));
       };
       const { resp, usedFallback } = await daFetchLibrary('https://main--repo--org.entmseds.live/page');
@@ -225,7 +225,7 @@ describe('da-library/helpers exports', () => {
       const { resp, usedFallback } = await daFetchLibrary('https://main--repo--org.entmseds.live/page');
       expect(resp.status).to.equal(500);
       expect(usedFallback).to.be.false;
-      expect(calls).to.deep.equal(['https://content.da.live/org/repo/page']);
+      expect(calls).to.deep.equal(['https://content.entmseds-da.live/org/repo/page']);
     });
 
     it('With skipRewrite, goes straight to the original URL and reports usedFallback', async () => {
@@ -371,7 +371,7 @@ describe('da-library/helpers/index getBlocks', () => {
     expect(result).to.deep.equal([]);
   });
 
-  it('Rewrites an AEM source URL to content.da.live before fetching', async () => {
+  it('Rewrites an AEM source URL to content.entmseds-da.live before fetching', async () => {
     let captured;
     window.fetch = (url) => {
       captured = url;
@@ -384,11 +384,11 @@ describe('da-library/helpers/index getBlocks', () => {
     expect(captured).to.equal('https://content.entmseds-da.live/org/repo/blocks.json');
   });
 
-  it('Falls back to the original AEM URL when content.da.live 404s', async () => {
+  it('Falls back to the original AEM URL when content.entmseds-da.live 404s', async () => {
     const calls = [];
     window.fetch = (url) => {
       calls.push(url);
-      if (url.startsWith('https://content.da.live/')) {
+      if (url.startsWith('https://content.entmseds-da.live/')) {
         return Promise.resolve(new Response('not found', { status: 404 }));
       }
       return Promise.resolve(new Response(
@@ -413,11 +413,11 @@ describe('da-library/helpers/index getBlocks', () => {
     expect(calls).to.deep.equal(['https://content.entmseds-da.live/org/repo/blocks.json']);
   });
 
-  it('When the source falls back, variants skip the content.da.live attempt', async () => {
+  it('When the source falls back, variants skip the content.entmseds-da.live attempt', async () => {
     const calls = [];
     window.fetch = (url) => {
       calls.push(url);
-      if (url === 'https://content.da.live/org/repo/blocks.json') {
+      if (url === 'https://content.entmseds-da.live/org/repo/blocks.json') {
         return Promise.resolve(new Response('not found', { status: 404 }));
       }
       if (url === 'https://main--repo--org.entmseds.page/blocks.json') {
@@ -516,11 +516,11 @@ describe('da-library/helpers/index getBlockVariants', () => {
     expect(captured).to.equal('https://example.com/page');
   });
 
-  it('Tries content.da.live first, then falls back to original AEM URL with .plain.html on 404', async () => {
+  it('Tries content.entmseds-da.live first, then falls back to original AEM URL with .plain.html on 404', async () => {
     const calls = [];
     window.fetch = (url) => {
       calls.push(url);
-      const status = url.startsWith('https://content.da.live/') ? 404 : 500;
+      const status = url.startsWith('https://content.entmseds-da.live/') ? 404 : 500;
       return Promise.resolve(new Response('', { status }));
     };
     await getBlockVariants('https://main--repo--org.entmseds.live/page');
@@ -528,7 +528,7 @@ describe('da-library/helpers/index getBlockVariants', () => {
     expect(calls[1]).to.equal('https://main--repo--org.entmseds.live/page.plain.html');
   });
 
-  it('Does not fall back when content.da.live returns non-404', async () => {
+  it('Does not fall back when content.entmseds-da.live returns non-404', async () => {
     const calls = [];
     window.fetch = (url) => {
       calls.push(url);
@@ -536,6 +536,6 @@ describe('da-library/helpers/index getBlockVariants', () => {
     };
     const result = await getBlockVariants('https://main--repo--org.entmseds.live/page');
     expect(result).to.deep.equal([]);
-    expect(calls).to.deep.equal(['https://content.da.live/org/repo/page']);
+    expect(calls).to.deep.equal(['https://content.entmseds-da.live/org/repo/page']);
   });
 });

@@ -72,7 +72,7 @@ function getBlockTableHtml(block) {
 function isAemHosted(path) {
   try {
     const { origin } = new URL(path);
-    return AEM_ORIGIN.some((aemOrigin) => origin.endsWith(aemOrigin));
+    return AEM_DOMAIN_SUFFIXES.some((aemOrigin) => origin.endsWith(aemOrigin));
   } catch {
     return false;
   }

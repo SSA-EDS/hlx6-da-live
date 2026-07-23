@@ -233,13 +233,13 @@ export function getPreviewUrl(previewUrl) {
     const url = new URL(previewUrl);
 
     if (url.origin.includes('--')) return url.href;
-    if (url.origin.includes('content.da.live')) {
+    if (url.origin.includes('content.entmseds-da.live')) {
       const [, org, site, ...split] = url.pathname.split('/');
-      return `https://${ref}--${site}--${org}.aem.page/${split.join('/')}`;
+      return `https://${ref}--${site}--${org}.entmseds.page/${split.join('/')}`;
     }
-    if (url.origin.includes('admin.da.live')) {
+    if (url.origin.includes('admin.entmseds-da.live')) {
       const [, , org, site, ...split] = url.pathname.split('/');
-      return `https://${ref}--${site}--${org}.aem.page/${split.join('/')}`;
+      return `https://${ref}--${site}--${org}.entmseds.page/${split.join('/')}`;
     }
   } catch {
     return false;
@@ -256,11 +256,11 @@ export function getAemUrlVars(url) {
       return [org, site, branch];
     }
 
-    if (urlObj.origin.includes('content.da.live')) {
+    if (urlObj.origin.includes('content.entmseds-da.live')) {
       const [, org, site] = urlObj.pathname.split('/');
       return [org, site, 'main'];
     }
-    if (urlObj.origin.includes('admin.da.live')) {
+    if (urlObj.origin.includes('admin.entmseds-da.live')) {
       const [, , org, site] = urlObj.pathname.split('/');
       return [org, site, 'main'];
     }

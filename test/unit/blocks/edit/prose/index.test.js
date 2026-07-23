@@ -98,8 +98,8 @@ describe('prose/index createConnection', () => {
     expect(result.wsProvider).to.exist;
     expect(result.ydoc).to.exist;
     expect(result.wsProvider.maxBackoffTime).to.equal(30000);
-    // Legacy (non-hlx6) docs keep the admin.da.live collab room.
-    expect(result.wsProvider.roomname).to.equal('https://admin.da.live/source/org/repo/page.html');
+    // Legacy (non-hlx6) docs keep the admin.entmseds-da.live collab room.
+    expect(result.wsProvider.roomname).to.equal('https://admin.entmseds-da.live/source/org/repo/page.html');
     // Clean up the underlying WS connection
     result.wsProvider.disconnect({ data: 'Client navigation' });
     result.wsProvider.destroy?.();
