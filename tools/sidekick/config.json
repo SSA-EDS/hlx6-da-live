@@ -1,6 +1,6 @@
 {
-  "project": "DA Live",
-  "host": "da.live",
+  "project": "DA Live - SSA 1128 CA",
+  "host": "entmseds-da.live",
   "plugins": [
     {
       "id": "da-tags",
