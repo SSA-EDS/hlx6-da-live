@@ -1,8 +1,6 @@
 {
   "project": "DA Live - SSA 1128 CA",
   "host": "entmseds-da.live",
-  "previewHost": "main--hlx6-da-live--ssa-eds.entmseds.page",
-  "liveHost": "main--hlx6-da-live--ssa-eds.entmseds.live",
   "plugins": [
     {
       "id": "da-tags",
