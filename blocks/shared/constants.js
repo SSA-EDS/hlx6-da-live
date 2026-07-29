@@ -1,4 +1,4 @@
-export const AEM_ORIGIN = 'https://admin.ent-aem.page';
+export const AEM_ORIGIN = 'https://admin.entmseds.page';
 
 export const SUPPORTED_FILES = {
   html: 'text/html',
@@ -15,28 +15,28 @@ export const SUPPORTED_FILES = {
 
 const DA_ADMIN_ENVS = {
   local: 'http://localhost:8787',
-  // stage: 'https://stage-admin.da.live',
-  // prod: 'https://admin.da.live',
-  stage: 'https://admin.ent-da.live',
-  prod: 'https://admin.ent-da.live',
+  // stage: 'https://stage-admin.entmseds-da.live',
+  // prod: 'https://admin.entmseds-da.live',
+  stage: 'https://admin.entmseds-da.live',
+  prod: 'https://admin.entmseds-da.live',
 };
 
 const DA_COLLAB_ENVS = {
   local: 'ws://localhost:4711',
-  stage: 'wss://collab.ent-da.live',
-  prod: 'wss://collab.ent-da.live',
+  stage: 'wss://stage-collab.entmseds-da.live',
+  prod: 'wss://collab.entmseds-da.live',
 };
 
 const DA_CONTENT_ENVS = {
   local: 'http://localhost:8788',
-  stage: 'https://stage-content.ent-da.live',
-  prod: 'https://content.ent-da.live',
+  stage: 'https://stage-content.entmseds-da.live',
+  prod: 'https://content.entmseds-da.live',
 };
 
 const DA_LIVE_PREVIEW_ENVS = {
   local: 'localhost:8000',
-  stage: 'stage-preview.ent-da.live',
-  prod: 'preview.ent-da.live',
+  stage: 'stage-preview.entmseds-da.live',
+  prod: 'preview.entmseds-da.live',
 };
 
 const DA_ETC_ENVS = {
@@ -53,7 +53,8 @@ function getDaEnv(location, key, envs) {
     localStorage.setItem(key, query);
   }
   const env = envs[localStorage.getItem(key) || 'prod'];
-  return location.origin === 'https://ent-da.page' ? env.replace('.live', '.page') : env;
+  // TODO: INFRA
+  return location.origin === 'https://entmseds-da.page' ? env.replace('.live', '.page') : env;
 }
 
 export const getDaAdmin = (() => {
@@ -72,12 +73,6 @@ export const LIVE_PREVIEW_DOMAIN = (() => getDaEnv(window.location, 'da-live-pre
 export const DA_ETC_ORIGIN = (() => getDaEnv(window.location, 'da-etc', DA_ETC_ENVS))();
 
 export function getLivePreviewUrl(owner, repo) {
-  // eds-ca has no preview.entmseds-da.live proxy provisioned; go straight to the
-  // AEM delivery domain instead of the (currently unrouted) DA-branded preview alias.
-  if (window.location.hostname.endsWith('entmseds-da.live')
-    || window.location.hostname.endsWith('entmseds-da.page')) {
-    return `https://main--${repo}--${owner}.entmseds.page`;
-  }
   const protocol = LIVE_PREVIEW_DOMAIN.startsWith('localhost') ? 'http' : 'https';
   return `${protocol}://main--${repo}--${owner}.${LIVE_PREVIEW_DOMAIN}`;
 }
