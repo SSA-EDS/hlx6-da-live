@@ -54,7 +54,7 @@ const CONFIG = {
   providers: { da: window.location.origin },
   decorateArea,
   imsClientId: 'ssa-eds',
-  imsScope: 'ab.manage,AdobeID,gnav,openid,org.read,read_organizations,session,additional_info.ownerOrg,additional_info.projectedProductContext,account_cluster.read',
+  imsScope: 'ab.manage,AdobeID,gnav,openid,org.read,read_organizations,session,aem.frontend.all,additional_info.ownerOrg,additional_info.projectedProductContext,account_cluster.read',
 };
 
 export default async function loadPage() {
