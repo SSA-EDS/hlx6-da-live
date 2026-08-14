@@ -56,6 +56,7 @@ const CONFIG = {
   imsClientId: 'ssa-eds',
   imsScope: 'ab.manage,AdobeID,gnav,openid,org.read,read_organizations,session,aem.frontend.all,additional_info.ownerOrg,additional_info.projectedProductContext,account_cluster.read',
 };
+// comment
 
 export default async function loadPage() {
   if (!nx2) {
