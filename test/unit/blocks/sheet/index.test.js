@@ -134,7 +134,7 @@ describe('finishSetup - structural change handlers', () => {
       let captured;
       window.fetch = async (url, opts) => {
         const urlStr = String(url);
-        if (urlStr.startsWith('https://admin.hlx.page/ping')) {
+        if (urlStr.startsWith('https://admin.entmseds.page/ping')) {
           return new Response('', { status: 200, headers: new Headers() });
         }
         if (opts?.method === 'POST' && urlStr.includes('/source/')) captured = urlStr;

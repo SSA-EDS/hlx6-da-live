@@ -793,7 +793,7 @@ describe('DaList helpers', () => {
       savedFetch = window.fetch;
       // Stub aemAction's preview fetch to return a valid response
       window.fetch = (url) => {
-        if (url.includes('admin.hlx.page/preview')) {
+        if (url.includes('admin.entmseds.page/preview')) {
           return Promise.resolve(new Response(
             JSON.stringify({ preview: { url: 'https://example.com/preview/page' } }),
             { status: 200 },
