@@ -1,7 +1,7 @@
 import { daFetch } from '../../../../shared/utils.js';
 import { getNx2Api } from '../../../../../scripts/utils.js';
 
-const SNAPSHOT_SCHEDULER_URL = 'https://helix-snapshot-scheduler-prod.adobeaem.workers.dev';
+const SNAPSHOT_SCHEDULER_URL = 'https://helix-snapshot-scheduler-ams-eds-ca.adobe-managed-services-enterprise.workers.dev';
 
 export async function isRegistered(org, site) {
   try {

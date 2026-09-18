@@ -11,7 +11,7 @@ const DA_ORIGINS = [
   'http://localhost:8787'];
 
 const AEM_ORIGINS = ['https://admin.entmseds.page', 'https://admin.entmseds.live'];
-const ETC_ORIGINS = ['https://stage-content.entmseds-da.live', 'https://helix-snapshot-scheduler-ci.adobeaem.workers.dev', 'https://helix-snapshot-scheduler-prod.adobeaem.workers.dev'];
+const ETC_ORIGINS = ['https://stage-content.entmseds-da.live', 'https://helix-snapshot-scheduler-ci.adobeaem.workers.dev', 'https://helix-snapshot-scheduler-ams-eds-ca.adobe-managed-services-enterprise.workers.dev'];
 const ALLOWED_TOKEN = [...DA_ORIGINS, ...AEM_ORIGINS, ...ETC_ORIGINS];
 
 let imsDetails;
@@ -196,7 +196,7 @@ export async function saveToAem(path, action) {
   return resp.json();
 }
 
-const SNAPSHOT_SCHEDULER_URL = 'https://helix-snapshot-scheduler-prod.adobeaem.workers.dev';
+const SNAPSHOT_SCHEDULER_URL = 'https://helix-snapshot-scheduler-ams-eds-ca.adobe-managed-services-enterprise.workers.dev';
 
 export async function getExistingSchedule(org, site, path) {
   try {
