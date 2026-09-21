@@ -45,16 +45,21 @@ export async function initIms() {
   if (imsDetails) return imsDetails;
   try {
     const nxBase = getNx();
+    // Kick off the (lazy, side-effecting) ims.js import before awaiting the alt-provider
+    // module below, so both fetches start back to back rather than one waiting on the
+    // other — a deployment with no alternate idp configured (the common case) shouldn't
+    // pay for that fetch to fully settle before ims.js's own even begins. Caught here
+    // (rather than left to reject the Promise.all below) so a hiccup loading the module the
+    // alt-provider path doesn't even need can't take down the path that does.
+    const imsModulePromise = import(`${nxBase}/utils/ims.js`).catch(() => null);
     const altAuth = await import(`${nxBase}/utils/helix-admin-auth.js`);
-    // Run discovery and the (lazy, side-effecting) ims.js import in parallel so a deployment
-    // with no alternate idp configured — the common case — doesn't pay a sequential round
-    // trip before IMS setup even starts.
     const [useAlt, imsModule] = await Promise.all([
       altAuth.isAvailable(),
-      import(`${nxBase}/utils/ims.js`),
+      imsModulePromise,
     ]);
-    const { loadIms } = useAlt ? altAuth : imsModule;
-    imsDetails = await loadIms();
+    const authModule = useAlt ? altAuth : imsModule;
+    if (!authModule) return null; // ims.js failed to load and it's the one needed here
+    imsDetails = await authModule.loadIms();
     // attachAuthMonitor watches window.adobeIMS, which the alternate provider never sets.
     if (!useAlt) attachAuthMonitor();
     return imsDetails;

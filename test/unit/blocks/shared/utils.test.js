@@ -259,6 +259,16 @@ describe('getAuthToken', () => {
     window.adobeIMS = { getAccessToken: () => null };
     expect(await getAuthToken()).to.be.null;
   });
+
+  it('Falls back through initIms() for the alternate provider (no window.adobeIMS)', async () => {
+    // The alternate provider never sets window.adobeIMS, so this only reaches initIms() if
+    // nx-ims is set — which is exactly the gap fixed by having that provider's storeToken()
+    // set nx-ims the same way ims.js does. Relies on the 'initIms' describe block above
+    // having already primed the shared initIms() singleton with the alt provider, signed in
+    // (module-level memoization means this file only gets one real initIms() outcome).
+    window.localStorage.setItem('nx-ims', 'true');
+    expect(await getAuthToken()).to.equal('hlxtst_abc.def.ghi');
+  });
 });
 
 describe('daFetch', () => {
