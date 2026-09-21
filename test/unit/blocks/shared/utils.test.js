@@ -15,7 +15,9 @@ import {
   sanitizeName,
   fetchDaConfigs,
   getAuthToken,
+  initIms,
 } from '../../../../blocks/shared/utils.js';
+import { testState as altAuthState } from '../../../fixtures/nx/utils/helix-admin-auth.js';
 
 // daFetch's 401-no-token path lazy-loads the banner module, which resolves
 // `${getNx()}/utils/utils.js`. Configure nx for the test environment so that
@@ -184,6 +186,30 @@ describe('sanitizeName', () => {
   it('Does not affect internal hyphens when trimming trailing', () => {
     expect(sanitizeName('foo-bar-', { trimTrailing: true })).to.equal('foo-bar');
     expect(sanitizeName('foo-bar-baz', { trimTrailing: true })).to.equal('foo-bar-baz');
+  });
+});
+
+// initIms() memoizes its result at module scope for the lifetime of this file's module
+// instance — a cache-busted re-import doesn't give a clean slate here, because it also
+// re-instantiates scripts/utils.js, losing the setNx() config set up above (confirmed
+// empirically: getNx() reads back undefined inside a freshly re-imported utils.js). So this
+// file gets exactly one real, ordered look at initIms(): the alternate-provider path, since
+// that's the new code being added. The complementary "no alternate idp configured" path
+// needs its own module graph and lives in utils-init-ims-fallback.test.js instead.
+describe('initIms', () => {
+  before(() => {
+    window.localStorage.removeItem('nx-ims');
+    altAuthState.available = true;
+    altAuthState.token = 'hlxtst_abc.def.ghi';
+  });
+
+  it('uses the alternate provider when it is available', async () => {
+    expect(await initIms()).to.deep.equal({ accessToken: { token: 'hlxtst_abc.def.ghi' } });
+  });
+
+  it('memoizes — a later call ignores changed state and returns the cached result', async () => {
+    altAuthState.token = 'hlxtst_should.not.be.seen';
+    expect(await initIms()).to.deep.equal({ accessToken: { token: 'hlxtst_abc.def.ghi' } });
   });
 });
 

@@ -44,9 +44,19 @@ function attachAuthMonitor() {
 export async function initIms() {
   if (imsDetails) return imsDetails;
   try {
-    const { loadIms } = await import(`${getNx()}/utils/ims.js`);
+    const nxBase = getNx();
+    const altAuth = await import(`${nxBase}/utils/helix-admin-auth.js`);
+    // Run discovery and the (lazy, side-effecting) ims.js import in parallel so a deployment
+    // with no alternate idp configured — the common case — doesn't pay a sequential round
+    // trip before IMS setup even starts.
+    const [useAlt, imsModule] = await Promise.all([
+      altAuth.isAvailable(),
+      import(`${nxBase}/utils/ims.js`),
+    ]);
+    const { loadIms } = useAlt ? altAuth : imsModule;
     imsDetails = await loadIms();
-    attachAuthMonitor();
+    // attachAuthMonitor watches window.adobeIMS, which the alternate provider never sets.
+    if (!useAlt) attachAuthMonitor();
     return imsDetails;
   } catch {
     return null;
