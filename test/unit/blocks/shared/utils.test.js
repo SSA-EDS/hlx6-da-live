@@ -15,7 +15,9 @@ import {
   sanitizeName,
   fetchDaConfigs,
   getAuthToken,
+  initIms,
 } from '../../../../blocks/shared/utils.js';
+import { testState as altAuthState } from '../../../fixtures/nx/utils/helix-admin-auth.js';
 
 // daFetch's 401-no-token path lazy-loads the banner module, which resolves
 // `${getNx()}/utils/utils.js`. Configure nx for the test environment so that
@@ -187,6 +189,30 @@ describe('sanitizeName', () => {
   });
 });
 
+// initIms() memoizes its result at module scope for the lifetime of this file's module
+// instance — a cache-busted re-import doesn't give a clean slate here, because it also
+// re-instantiates scripts/utils.js, losing the setNx() config set up above (confirmed
+// empirically: getNx() reads back undefined inside a freshly re-imported utils.js). So this
+// file gets exactly one real, ordered look at initIms(): the alternate-provider path, since
+// that's the new code being added. The complementary "no alternate idp configured" path
+// needs its own module graph and lives in utils-init-ims-fallback.test.js instead.
+describe('initIms', () => {
+  before(() => {
+    window.localStorage.removeItem('nx-ims');
+    altAuthState.available = true;
+    altAuthState.token = 'hlxtst_abc.def.ghi';
+  });
+
+  it('uses the alternate provider when it is available', async () => {
+    expect(await initIms()).to.deep.equal({ accessToken: { token: 'hlxtst_abc.def.ghi' } });
+  });
+
+  it('memoizes — a later call ignores changed state and returns the cached result', async () => {
+    altAuthState.token = 'hlxtst_should.not.be.seen';
+    expect(await initIms()).to.deep.equal({ accessToken: { token: 'hlxtst_abc.def.ghi' } });
+  });
+});
+
 describe('getAuthToken', () => {
   let savedAdobeIMS;
 
@@ -232,6 +258,16 @@ describe('getAuthToken', () => {
     window.localStorage.setItem('nx-ims', 'true');
     window.adobeIMS = { getAccessToken: () => null };
     expect(await getAuthToken()).to.be.null;
+  });
+
+  it('Falls back through initIms() for the alternate provider (no window.adobeIMS)', async () => {
+    // The alternate provider never sets window.adobeIMS, so this only reaches initIms() if
+    // nx-ims is set — which is exactly the gap fixed by having that provider's storeToken()
+    // set nx-ims the same way ims.js does. Relies on the 'initIms' describe block above
+    // having already primed the shared initIms() singleton with the alt provider, signed in
+    // (module-level memoization means this file only gets one real initIms() outcome).
+    window.localStorage.setItem('nx-ims', 'true');
+    expect(await getAuthToken()).to.equal('hlxtst_abc.def.ghi');
   });
 });
 
