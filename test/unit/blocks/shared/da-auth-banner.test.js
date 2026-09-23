@@ -4,6 +4,7 @@ import { setNx } from '../../../../scripts/utils.js';
 setNx('/test/fixtures/nx', { hostname: 'example.com' });
 
 const { showAuthBanner } = await import('../../../../blocks/shared/da-auth-banner/da-auth-banner.js');
+const { testState: altAuthState } = await import('../../../fixtures/nx/utils/helix-admin-auth.js');
 
 const wait = (ms) => new Promise((r) => { setTimeout(r, ms); });
 
@@ -22,6 +23,7 @@ describe('da-auth-banner', () => {
     // it so the leaked flag doesn't trip later tests that don't configure setNx.
     window.localStorage.removeItem('nx-ims');
     document.querySelectorAll('da-dialog.da-auth-banner').forEach((el) => el.remove());
+    altAuthState.available = false;
   });
 
   it('showAuthBanner mounts a single banner element', () => {
@@ -47,5 +49,27 @@ describe('da-auth-banner', () => {
     await banner.action.click();
     await wait(50);
     expect(signInCalls).to.equal(1);
+  });
+
+  it('shows a first-time sign-in prompt (not "session expired") when hasExistingSession is false', async () => {
+    const banner = showAuthBanner(false);
+    await banner.updateComplete;
+    expect(banner.title).to.equal('Sign in required');
+    expect(banner.action?.label).to.equal('Sign in');
+  });
+
+  it('Sign-in action uses the alt provider instead of adobeIMS when helix-admin has one configured', async () => {
+    let signInCalls = 0;
+    window.adobeIMS = { signIn: () => { signInCalls += 1; } };
+    altAuthState.available = true;
+
+    const banner = showAuthBanner();
+    await banner.updateComplete;
+    await banner.action.click();
+    await wait(50);
+
+    // The mock alt provider's handleSignIn() is an intentional no-op (see the fixture) — what
+    // matters here is that real IMS's signIn was NOT reached, proving the alt branch was taken.
+    expect(signInCalls).to.equal(0);
   });
 });
