@@ -126,6 +126,11 @@ export const daFetch = async (url, opts = {}) => {
       }
       // eslint-disable-next-line no-console
       console.warn('You need to sign in because you are not authorized to access this page', url);
+      // Guarantees isAvailable()/loadIms() have resolved (initIms() memoizes) before the banner's
+      // button can be clicked — daFetch() can 401 before loadPage()'s own initIms() call has
+      // settled, and the alt provider's handleSignIn() needs that resolved by click time, not
+      // still pending (see da-auth-banner.js's triggerSignIn()).
+      await initIms();
       const { showAuthBanner } = await import('./da-auth-banner/da-auth-banner.js');
       showAuthBanner();
     }
