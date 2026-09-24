@@ -24,7 +24,7 @@ import {
 
 import { getSchema } from 'da-parser';
 import { COLLAB_ORIGIN, DA_ORIGIN } from '../../shared/constants.js';
-import { getAuthToken } from '../../shared/utils.js';
+import { getAuthToken, initIms } from '../../shared/utils.js';
 import { getNx2Api } from '../../../scripts/utils.js';
 import { getDiffClass, checkForLocNodes, addActiveView } from './diff/diff-utils.js';
 import { debounce, initDaMetadata } from '../utils/helpers.js';
@@ -96,6 +96,10 @@ export async function createConnection(path) {
         // the reconnect loop, and surface the modal if the user was signed in.
         if (lastSentToken) {
           try {
+            // Guarantees isAvailable()/loadIms() have resolved before the banner's button can
+            // be clicked — this WS disconnect can fire before loadPage()'s own initIms() call
+            // has settled (see the identical fix in shared/utils.js's daFetch()).
+            await initIms();
             const { showAuthBanner } = await import('../../shared/da-auth-banner/da-auth-banner.js');
             showAuthBanner();
           } catch { /* ignore */ }

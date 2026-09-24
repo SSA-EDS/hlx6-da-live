@@ -38,7 +38,7 @@ import imageFocalPoint from '../../edit/prose/plugins/imageFocalPoint.js';
 import sectionPasteHandler from '../../edit/prose/plugins/sectionPasteHandler.js';
 import base64Uploader from './prose-plugins/base64Uploader.js';
 import { getNx } from '../../../scripts/utils.js';
-import { getAuthToken } from '../../shared/utils.js';
+import { getAuthToken, initIms } from '../../shared/utils.js';
 import { generateColor, getCollabIdentity } from './utils/collab.js';
 import { checkBlockLibraryConfigured } from '../editor-utils/block-slash.js';
 
@@ -123,6 +123,10 @@ export default async function initProse({
         wsProvider.shouldConnect = false;
         if (lastSentToken) {
           try {
+            // Guarantees isAvailable()/loadIms() have resolved before the banner's button can
+            // be clicked — this WS disconnect can fire before loadPage()'s own initIms() call
+            // has settled (see the identical fix in shared/utils.js's daFetch()).
+            await initIms();
             const { showAuthBanner } = await import('../../shared/da-auth-banner/da-auth-banner.js');
             showAuthBanner();
           } catch { /* ignore */ }

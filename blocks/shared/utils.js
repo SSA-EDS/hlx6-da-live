@@ -62,6 +62,15 @@ export async function initIms() {
     imsDetails = await authModule.loadIms();
     // attachAuthMonitor watches window.adobeIMS, which the alternate provider never sets.
     if (!useAlt) attachAuthMonitor();
+    // IMS's own sign-in is a gesture-free redirect, safely triggered reactively from wherever
+    // a request first needs it. The alt provider's is a popup, which needs a real click behind
+    // it — and unlike nx1 pages, nothing here ever renders a page-level sign-in gate, so a
+    // brand-new visitor would otherwise have nothing to click. Reuse the existing "session
+    // expired" banner for this too, just with different copy (see showAuthBanner).
+    if (useAlt && !imsDetails?.accessToken) {
+      const { showAuthBanner } = await import('./da-auth-banner/da-auth-banner.js');
+      showAuthBanner(false);
+    }
     return imsDetails;
   } catch {
     return null;
@@ -117,6 +126,11 @@ export const daFetch = async (url, opts = {}) => {
       }
       // eslint-disable-next-line no-console
       console.warn('You need to sign in because you are not authorized to access this page', url);
+      // Guarantees isAvailable()/loadIms() have resolved (initIms() memoizes) before the banner's
+      // button can be clicked — daFetch() can 401 before loadPage()'s own initIms() call has
+      // settled, and the alt provider's handleSignIn() needs that resolved by click time, not
+      // still pending (see da-auth-banner.js's triggerSignIn()).
+      await initIms();
       const { showAuthBanner } = await import('./da-auth-banner/da-auth-banner.js');
       showAuthBanner();
     }
