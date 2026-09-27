@@ -52,7 +52,14 @@ export async function initIms() {
     // (rather than left to reject the Promise.all below) so a hiccup loading the module the
     // alt-provider path doesn't even need can't take down the path that does.
     const imsModulePromise = import(`${nxBase}/utils/ims.js`).catch(() => null);
-    const altAuth = await import(`${nxBase}/utils/helix-admin-auth.js`);
+    // helix-admin-auth.js only exists under nx1's path, never nx2's (confirmed directly
+    // against hlx6-da-nx) — nxBase can be nx2-suffixed depending on the page's nxver, so this
+    // strips a trailing "2" rather than using nxBase as-is. Same fix already applied in
+    // da-auth-banner.js's triggerSignIn() — missed here, which 404'd this import on any nx2
+    // page and silently broke initIms() for the whole portal (caught by the outer try/catch,
+    // so it looked like "never signs in" rather than an explicit error).
+    const nx1Base = nxBase.replace(/2$/, '');
+    const altAuth = await import(`${nx1Base}/utils/helix-admin-auth.js`);
     const [useAlt, imsModule] = await Promise.all([
       altAuth.isAvailable(),
       imsModulePromise,
