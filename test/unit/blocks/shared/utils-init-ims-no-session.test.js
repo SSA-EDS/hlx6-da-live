@@ -12,14 +12,14 @@ describe('initIms — alternate provider available, no session yet', () => {
     document.querySelectorAll('da-dialog.da-auth-banner').forEach((el) => el.remove());
   });
 
-  it('shows the sign-in banner — the alt provider has no gesture-free way to prompt a brand-new visitor', async () => {
+  it('resolves anonymous without forcing the sign-in banner — da-auth-status is now the '
+    + 'page-level sign-in affordance for a brand-new visitor, not this banner', async () => {
     altAuthState.available = true;
     altAuthState.token = null;
 
     expect(await initIms()).to.deep.equal({ anonymous: true });
 
     const banner = document.querySelector('da-dialog.da-auth-banner');
-    expect(banner).to.not.equal(null);
-    expect(banner.title).to.equal('Sign in required');
+    expect(banner).to.equal(null);
   });
 });
