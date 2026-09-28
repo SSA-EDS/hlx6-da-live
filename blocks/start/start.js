@@ -1,7 +1,7 @@
 import { LitElement, html, nothing } from 'da-lit';
 import { getDaAdmin } from '../shared/constants.js';
 import getSheet from '../shared/sheet.js';
-import { daFetch } from '../shared/utils.js';
+import { daFetch, initIms } from '../shared/utils.js';
 import { copyConfig, copyContent, previewContent } from './index.js';
 import { getNx2Api, sanitizePathParts } from '../../scripts/utils.js';
 
@@ -220,8 +220,11 @@ class DaStart extends LitElement {
     e.preventDefault();
     const siteUrl = e.target.action;
 
-    // Check if user is signed in
-    if (!window.adobeIMS?.isSignedInUser()) {
+    // Provider-agnostic: window.adobeIMS is never set by the alt provider, so checking it
+    // directly always read as signed-out here even for a genuinely signed-in alt-provider
+    // user. initIms() resolves whichever provider is actually active.
+    const details = await initIms();
+    if (!details?.accessToken) {
       this._errorText = 'You need to sign in first.';
       return;
     }
@@ -231,7 +234,7 @@ class DaStart extends LitElement {
     const { status: orgLoadStatus } = await loadConfig(this.org);
     if (orgLoadStatus === 404) {
       // Check if user has an email address
-      const { email } = await window.adobeIMS.getProfile();
+      const { email } = details;
       if (!email) {
         this._errorText = 'Make sure your profile contains an email address.';
         this._loading = false;

@@ -1,5 +1,6 @@
 import { LitElement, html, nothing } from 'da-lit';
 import getSheet from '../../../../shared/sheet.js';
+import { initIms } from '../../../../shared/utils.js';
 import { deleteFromTarget, fetchTargetConfig, getOfferDetails, savePreview, sendToTarget } from './utils.js';
 
 const sheet = await getSheet(import.meta.url.replace('js', 'css'));
@@ -46,7 +47,10 @@ class DaTarget extends LitElement {
 
     const { url: aemPath } = prevResult.preview;
     this._statusText = 'Sending to Target...';
-    const { displayName } = await window.adobeIMS.getProfile();
+    // Provider-agnostic: the alt provider has no displayName (see helix-admin-auth.js's
+    // loadIms) — email is the closest real (not fabricated) attribution available.
+    const details = await initIms();
+    const displayName = details?.displayName || details?.email;
 
     const result = await sendToTarget(org, site, this._name, aemPath, displayName, this._offerId);
     if (result.error) {

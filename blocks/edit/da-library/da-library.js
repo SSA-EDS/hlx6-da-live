@@ -2,7 +2,7 @@ import { LitElement, html, nothing } from 'da-lit';
 import { DOMParser as proseDOMParser, DOMSerializer, Slice, TextSelection } from 'da-y-wrapper';
 import { htmlToProse } from '../utils/helpers.js';
 import { getNx, sanitizePathParts } from '../../../scripts/utils.js';
-import { getPostMessageTargetOrigin } from '../../shared/utils.js';
+import { getPostMessageTargetOrigin, getAuthToken } from '../../shared/utils.js';
 import getSheet from '../../shared/sheet.js';
 import inlinesvg from '../../shared/inlinesvg.js';
 import searchFor from './helpers/search.js';
@@ -296,12 +296,13 @@ class DaLibrary extends LitElement {
     const [org, repo, ...path] = sanitizePathParts(hash.slice(1));
 
     // Wait for iframe to be ready before sending
-    setTimeout(() => {
+    setTimeout(async () => {
       if (!target.contentWindow) return;
 
       const project = { view, org, repo, ref: 'main', path: `/${path.join('/')}` };
 
-      const { token } = window.adobeIMS.getAccessToken();
+      // Provider-agnostic: window.adobeIMS is never set by the alt provider.
+      const token = await getAuthToken();
 
       const message = {
         ready: true,
