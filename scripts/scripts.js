@@ -72,6 +72,11 @@ export default async function loadPage() {
   const imsReady = initIms();
   await setConfig(CONFIG);
 
+  // Persistent, page-level sign-in/sign-out affordance — see da-auth-status.js for why this
+  // (rather than initIms() forcing a blocking dialog) is now how a brand-new visitor signs in.
+  const { mountAuthStatus } = await import('../blocks/shared/da-auth-status/da-auth-status.js');
+  mountAuthStatus();
+
   if (isImsCallback) {
     await imsReady;
     if (!hadAccessToken) {

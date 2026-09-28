@@ -6,7 +6,12 @@
 // empirically — the two import styles resolve to different query strings, landing as two
 // separate module instances with independent state otherwise). window is guaranteed shared
 // across both, same as this suite already relies on for window.adobeIMS elsewhere.
-window.__helixAdminAuthTestState ??= { available: false, token: null, throwOnLoad: false };
+window.__helixAdminAuthTestState ??= {
+  available: false,
+  token: null,
+  email: null,
+  throwOnLoad: false,
+};
 export const testState = window.__helixAdminAuthTestState;
 
 export function isAvailable() {
@@ -15,7 +20,11 @@ export function isAvailable() {
 
 export async function loadIms() {
   if (testState.throwOnLoad) throw new Error('boom');
-  return testState.token ? { accessToken: { token: testState.token } } : { anonymous: true };
+  if (!testState.token) return { anonymous: true };
+  return {
+    accessToken: { token: testState.token },
+    ...(testState.email ? { email: testState.email } : {}),
+  };
 }
 
 export function handleSignIn() {}
