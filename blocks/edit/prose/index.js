@@ -544,6 +544,15 @@ export default async function initProse({ path, permissions, doc, daContent, wsP
         id: profile.userId,
       });
     });
+  } else if ((await initIms())?.email) {
+    // The alt provider has no displayName/userId (see helix-admin-auth.js's loadIms) — email
+    // is all there is to identify this user to collaborators by.
+    const { email } = await initIms();
+    wsProvider.awareness.setLocalStateField('user', {
+      color: generateColor(email),
+      name: email,
+      id: email,
+    });
   } else {
     wsProvider.awareness.setLocalStateField('user', {
       color: generateColor(`${wsProvider.awareness.clientID}`),

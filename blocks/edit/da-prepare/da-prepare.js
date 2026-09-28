@@ -1,5 +1,5 @@
 import { LitElement, html, nothing } from 'da-lit';
-import { fetchDaConfigs, getPostMessageTargetOrigin } from '../../shared/utils.js';
+import { fetchDaConfigs, getPostMessageTargetOrigin, getAuthToken } from '../../shared/utils.js';
 import getSheet from '../../shared/sheet.js';
 
 const sheet = await getSheet(import.meta.url.replace('js', 'css'));
@@ -123,13 +123,14 @@ export default class DaPrepare extends LitElement {
     const targetOrigin = getPostMessageTargetOrigin(target.src);
     const channel = new MessageChannel();
 
-    setTimeout(() => {
+    setTimeout(async () => {
       if (!target.contentWindow) return;
 
       const { view, org, site, path } = this.details;
 
       const context = { view, org, site, ref: 'main', path };
-      const { token } = window.adobeIMS.getAccessToken();
+      // Provider-agnostic: window.adobeIMS is never set by the alt provider.
+      const token = await getAuthToken();
 
       const message = { ready: true, context, token };
 
