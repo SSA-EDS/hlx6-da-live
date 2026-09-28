@@ -18,6 +18,7 @@ import {
   initIms,
 } from '../../../../blocks/shared/utils.js';
 import { testState as altAuthState } from '../../../fixtures/nx/utils/helix-admin-auth.js';
+import { testState as nx2ApiTestState } from '../../../fixtures/nx2/utils/api.js';
 
 // daFetch's 401-no-token path lazy-loads the banner module, which resolves
 // `${getNx()}/utils/utils.js`. Configure nx for the test environment so that
@@ -400,6 +401,51 @@ describe('daFetch', () => {
 
     const resp = await daFetch('https://example.com/test');
     expect(resp.status).to.equal(403);
+  });
+
+  it('On 401 for the alt provider with org/site known, exchanges for a site-scoped token and retries', async () => {
+    // initIms() (see the 'initIms' describe block above) is already memoized in this file to
+    // the alt provider, signed in as 'hlxtst_abc.def.ghi' — that's the token the first call
+    // below carries; the exchange (mocked via the nx2 api fixture's testState) supplies the
+    // second.
+    window.localStorage.setItem('nx-ims', 'true');
+    nx2ApiTestState.siteToken = 'hlxtst_site.scoped.token';
+
+    let fetchCalls = 0;
+    const capturedAuth = [];
+    window.fetch = (url, opts) => {
+      fetchCalls += 1;
+      capturedAuth.push(opts?.headers?.Authorization);
+      return Promise.resolve(new Response('ok', { status: fetchCalls === 1 ? 401 : 200 }));
+    };
+
+    const resp = await daFetch(
+      'http://localhost:8787/source/o/r/p.html',
+      {},
+      { org: 'myorg', site: 'mysite' },
+    );
+
+    expect(resp.ok).to.equal(true);
+    expect(fetchCalls).to.equal(2);
+    expect(capturedAuth).to.deep.equal(['Bearer hlxtst_abc.def.ghi', 'Bearer hlxtst_site.scoped.token']);
+  });
+
+  it('Does not attempt the site-token exchange when org/site are not passed', async () => {
+    window.localStorage.setItem('nx-ims', 'true');
+    nx2ApiTestState.siteToken = 'hlxtst_site.scoped.token';
+
+    let fetchCalls = 0;
+    window.fetch = () => {
+      fetchCalls += 1;
+      return Promise.resolve(new Response('nope', { status: 401 }));
+    };
+
+    // noRedirect: true — otherwise this hits the existing "already have a token but still
+    // 401" path, a real window.location navigation unrelated to what this test checks.
+    const resp = await daFetch('http://localhost:8787/source/o/r/p.html', { noRedirect: true });
+
+    expect(resp.status).to.equal(401);
+    expect(fetchCalls).to.equal(1);
   });
 });
 

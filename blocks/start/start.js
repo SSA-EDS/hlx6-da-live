@@ -253,7 +253,7 @@ class DaStart extends LitElement {
       }
     }
 
-    const resp = await daFetch(siteUrl, { method: 'PUT' });
+    const resp = await daFetch(siteUrl, { method: 'PUT' }, { org: this.org, site: this.site });
     this._loading = false;
     if (!resp.ok) {
       if (resp.status === 401 || resp.status === 403) {
