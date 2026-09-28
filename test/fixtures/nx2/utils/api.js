@@ -437,6 +437,15 @@ export const daFetch = async ({ url, opts = { method: 'GET' }, redirect = false 
   return resp;
 };
 
+// Mock for tests exercising shared/utils.js's daFetch site-token-exchange retry. Anchored on
+// window rather than a plain module-scope binding: getNx2Api()'s dynamic, runtime-computed
+// import() specifier resolves to a different module instance than a test file's own static
+// import of this same fixture (see helix-admin-auth.js's own testState for the identical,
+// already-diagnosed issue) — window is guaranteed shared across both.
+window.__nx2ApiTestState ??= { siteToken: null };
+export const testState = window.__nx2ApiTestState;
+export const getAemSiteToken = async () => ({ siteToken: testState.siteToken });
+
 export const isHlx6 = (() => {
   const cache = {};
 

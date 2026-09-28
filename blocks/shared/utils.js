@@ -118,7 +118,7 @@ export async function getAuthToken() {
   return ims?.accessToken?.token || null;
 }
 
-export const daFetch = async (url, opts = {}) => {
+export const daFetch = async (url, opts = {}, { org, site } = {}) => {
   opts.headers = opts.headers || {};
   const setBearer = (tok) => {
     const canToken = ALLOWED_TOKEN.some((origin) => new URL(url).origin === origin);
@@ -133,6 +133,24 @@ export const daFetch = async (url, opts = {}) => {
   if (accessToken) setBearer(accessToken);
 
   let resp = await fetch(url, opts);
+
+  // The alt provider's account-level token (no site/org yet — see helix-admin-ams's
+  // getTransientAccountTokenInfo) can't satisfy da-admin's per-site audience check, so this
+  // 401s until upgraded. IMS never hits this: its token already works for any site. Mirrors
+  // nx2/utils/api.js's daFetch (hlx6-da-nx) — same reason, same fix; org/site have to be
+  // passed in here since, unlike that file's own namespaced methods, this daFetch's callers
+  // are free-form URLs with no guaranteed shape to parse them back out of.
+  if (resp.status === 401 && org && site && DA_ORIGINS.some((origin) => url.startsWith(origin))) {
+    const { useAlt } = await resolveAuthModule();
+    if (useAlt) {
+      const { getAemSiteToken } = await getNx2Api();
+      const { siteToken } = await getAemSiteToken({ org, site });
+      if (siteToken && siteToken !== accessToken) {
+        setBearer(siteToken);
+        resp = await fetch(url, opts);
+      }
+    }
+  }
 
   if (resp.status === 401 && opts.noRedirect !== true
     && DA_ORIGINS.some((origin) => url.startsWith(origin))) {
