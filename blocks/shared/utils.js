@@ -118,6 +118,18 @@ export async function getAuthToken() {
   return ims?.accessToken?.token || null;
 }
 
+// DA admin API URLs all follow `{origin}/{op}/{org}/{site}/{path...}` — used as a fallback
+// when a caller doesn't pass `{org, site}` explicitly, so the site-token upgrade below still
+// runs for those call sites instead of skipping straight to the no-access redirect.
+function parseOrgSiteFromUrl(url) {
+  try {
+    const [, , org, site] = new URL(url).pathname.split('/');
+    return { org, site };
+  } catch {
+    return {};
+  }
+}
+
 export const daFetch = async (url, opts = {}, { org, site } = {}) => {
   opts.headers = opts.headers || {};
   const setBearer = (tok) => {
@@ -134,26 +146,30 @@ export const daFetch = async (url, opts = {}, { org, site } = {}) => {
 
   let resp = await fetch(url, opts);
 
+  const isDaOrigin = DA_ORIGINS.some((origin) => url.startsWith(origin));
+
   // The alt provider's account-level token (no site/org yet — see helix-admin-ams's
   // getTransientAccountTokenInfo) can't satisfy da-admin's per-site audience check, so this
   // 401s until upgraded. IMS never hits this: its token already works for any site. Mirrors
-  // nx2/utils/api.js's daFetch (hlx6-da-nx) — same reason, same fix; org/site have to be
-  // passed in here since, unlike that file's own namespaced methods, this daFetch's callers
-  // are free-form URLs with no guaranteed shape to parse them back out of.
-  if (resp.status === 401 && org && site && DA_ORIGINS.some((origin) => url.startsWith(origin))) {
-    const { useAlt } = await resolveAuthModule();
-    if (useAlt) {
-      const { getAemSiteToken } = await getNx2Api();
-      const { siteToken } = await getAemSiteToken({ org, site });
-      if (siteToken && siteToken !== accessToken) {
-        setBearer(siteToken);
-        resp = await fetch(url, opts);
+  // nx2/utils/api.js's daFetch (hlx6-da-nx) — same reason, same fix. Falls back to parsing
+  // org/site from the URL when the caller doesn't pass them, so every DA-origin call site
+  // gets the upgrade attempt, not just the ones that remembered to pass {org, site}.
+  if (resp.status === 401 && isDaOrigin) {
+    const resolved = (org && site) ? { org, site } : parseOrgSiteFromUrl(url);
+    if (resolved.org && resolved.site) {
+      const { useAlt } = await resolveAuthModule();
+      if (useAlt) {
+        const { getAemSiteToken } = await getNx2Api();
+        const { siteToken } = await getAemSiteToken(resolved);
+        if (siteToken && siteToken !== accessToken) {
+          setBearer(siteToken);
+          resp = await fetch(url, opts);
+        }
       }
     }
   }
 
-  if (resp.status === 401 && opts.noRedirect !== true
-    && DA_ORIGINS.some((origin) => url.startsWith(origin))) {
+  if (resp.status === 401 && opts.noRedirect !== true && isDaOrigin) {
     // Silent recovery: another tab may have just refreshed/signed in. Ask imslib
     // for a fresh token and retry once before any user-visible disruption.
     let refreshed = null;

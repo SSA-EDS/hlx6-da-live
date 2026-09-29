@@ -430,7 +430,32 @@ describe('daFetch', () => {
     expect(capturedAuth).to.deep.equal(['Bearer hlxtst_abc.def.ghi', 'Bearer hlxtst_site.scoped.token']);
   });
 
-  it('Does not attempt the site-token exchange when org/site are not passed', async () => {
+  it('Derives org/site from the URL and exchanges for a site-scoped token when the caller '
+    + 'does not pass them explicitly', async () => {
+    // Regression test: callers like ew-editor-doc/utils/source.js's checkDoc() call daFetch
+    // without a third {org, site} argument at all — the upgrade attempt used to be silently
+    // skipped for those, leaving a stale account-level token to hit the no-access redirect
+    // below instead of ever trying to exchange it.
+    window.localStorage.setItem('nx-ims', 'true');
+    nx2ApiTestState.siteToken = 'hlxtst_site.scoped.token';
+
+    let fetchCalls = 0;
+    const capturedAuth = [];
+    window.fetch = (url, opts) => {
+      fetchCalls += 1;
+      capturedAuth.push(opts?.headers?.Authorization);
+      return Promise.resolve(new Response('ok', { status: fetchCalls === 1 ? 401 : 200 }));
+    };
+
+    const resp = await daFetch('http://localhost:8787/source/o/r/p.html');
+
+    expect(resp.ok).to.equal(true);
+    expect(fetchCalls).to.equal(2);
+    expect(capturedAuth).to.deep.equal(['Bearer hlxtst_abc.def.ghi', 'Bearer hlxtst_site.scoped.token']);
+  });
+
+  it('Does not attempt the site-token exchange when org/site are not passed and cannot be '
+    + 'parsed from the URL', async () => {
     window.localStorage.setItem('nx-ims', 'true');
     nx2ApiTestState.siteToken = 'hlxtst_site.scoped.token';
 
@@ -442,7 +467,9 @@ describe('daFetch', () => {
 
     // noRedirect: true — otherwise this hits the existing "already have a token but still
     // 401" path, a real window.location navigation unrelated to what this test checks.
-    const resp = await daFetch('http://localhost:8787/source/o/r/p.html', { noRedirect: true });
+    // Only one path segment (no site) after the origin, so parseOrgSiteFromUrl can't derive
+    // a site either.
+    const resp = await daFetch('http://localhost:8787/ping', { noRedirect: true });
 
     expect(resp.status).to.equal(401);
     expect(fetchCalls).to.equal(1);
