@@ -24,7 +24,7 @@ import {
 
 import { getSchema } from 'da-parser';
 import { COLLAB_ORIGIN, DA_ORIGIN } from '../../shared/constants.js';
-import { getAuthToken, initIms } from '../../shared/utils.js';
+import { getAuthToken, initIms, resolveAuthModule } from '../../shared/utils.js';
 import { getNx2Api } from '../../../scripts/utils.js';
 import { getDiffClass, checkForLocNodes, addActiveView } from './diff/diff-utils.js';
 import { debounce, initDaMetadata } from '../utils/helpers.js';
@@ -90,7 +90,19 @@ export async function createConnection(path) {
       provider.shouldConnect = false;
       // Force imslib to attempt a refresh before deciding to give up.
       try { await window.adobeIMS?.refreshToken?.(); } catch { /* ignore */ }
-      const fresh = await getAuthToken();
+      let fresh = await getAuthToken();
+      if ((!fresh || fresh === lastSentToken) && org && site) {
+        // getAuthToken() only ever returns initIms()'s memoized, page-load-time token — it
+        // never learns about a site-scoped token minted later by daFetch's own upgrade (see
+        // shared/utils.js). Without this, a connection opened with the alt provider's
+        // account-level token 4401s here forever even though a working site token exists.
+        const { useAlt } = await resolveAuthModule();
+        if (useAlt) {
+          const { getAemSiteToken } = await getNx2Api();
+          const { siteToken } = await getAemSiteToken({ org, site });
+          if (siteToken) fresh = siteToken;
+        }
+      }
       if (!fresh || fresh === lastSentToken) {
         // No new token to try — retrying would loop on the same 4401. Stop
         // the reconnect loop, and surface the modal if the user was signed in.
