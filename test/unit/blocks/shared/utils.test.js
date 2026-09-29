@@ -792,6 +792,20 @@ describe('fetchDaConfigs', () => {
     expect(resolved).to.equal(null);
     expect(fetchCalled).to.be.false;
   });
+
+  it('A 401 on the org-only config request does not redirect the page, even without a '
+    + 'site to upgrade the token for', async () => {
+    // Regression test: the org-only request (no site) races in parallel with the
+    // site-level one and can never be upgraded, so it used to win the race and redirect
+    // the whole page to /not-found before the site-level request's own token exchange
+    // could finish. If it still redirected, this would navigate the real test page away
+    // and the assertion below would never run.
+    window.fetch = () => Promise.resolve(new Response('nope', { status: 401 }));
+
+    const [orgResult] = fetchDaConfigs({ org: 'uniqueorg1', site: undefined });
+    const resolved = await orgResult;
+    expect(resolved).to.deep.equal({ error: 'Error loading /uniqueorg1', status: 401 });
+  });
 });
 
 describe('saveDaVersion', () => {
