@@ -41,6 +41,16 @@ async function setUI(el) {
   const details = getPathDetails();
   if (!details) return;
 
+  if (!details.site) {
+    // /edit only makes sense for a specific document (org+site+path) — a depth-1 hash like
+    // /edit#/org has no site to edit. Attempting the doc/WS load anyway still opens the WS
+    // collab connection with no site to exchange an upgraded token for, so it 4401s forever
+    // and shows the "session expired" banner (see prose/index.js's connection-close handler)
+    // even though nothing is actually wrong with the user's session.
+    window.location = `/#/${details.org}`;
+    return;
+  }
+
   // Warm the hlx6 probe cache up front so createConnection's `await isHlx6(...)`
   // resolves from cache instead of gating the WebSocket on a network round-trip.
   getNx2Api().then(({ isHlx6 }) => isHlx6(details.org, details.site)).catch(() => {});
