@@ -432,7 +432,11 @@ export const fetchDaConfigs = (() => {
   const configCache = {};
 
   const fetchConfig = async (pathname) => {
-    const resp = await daFetch(`${DA_ORIGIN}/config${pathname}/`);
+    // noRedirect: true — this org-level check runs in parallel with the site-level one below
+    // and has no site to exchange a token for, so it can never be upgraded on a 401. Without
+    // this it would win the race and redirect the whole page to /not-found before the
+    // site-level fetch's own (legitimate) site-token exchange gets a chance to finish.
+    const resp = await daFetch(`${DA_ORIGIN}/config${pathname}/`, { noRedirect: true });
     if (!resp.ok) return { error: `Error loading ${pathname}`, status: resp.status };
     return resp.json();
   };
