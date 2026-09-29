@@ -72,11 +72,6 @@ export default async function loadPage() {
   const imsReady = initIms();
   await setConfig(CONFIG);
 
-  // Persistent, page-level sign-in/sign-out affordance — see da-auth-status.js for why this
-  // (rather than initIms() forcing a blocking dialog) is now how a brand-new visitor signs in.
-  const { mountAuthStatus } = await import('../blocks/shared/da-auth-status/da-auth-status.js');
-  mountAuthStatus();
-
   if (isImsCallback) {
     await imsReady;
     if (!hadAccessToken) {
@@ -87,6 +82,18 @@ export default async function loadPage() {
   }
 
   await loadArea();
+
+  // Persistent, page-level sign-in/sign-out affordance — see da-auth-status.js for why this
+  // (rather than initIms() forcing a blocking dialog) is now how a brand-new visitor signs in.
+  // Pages using nx's own nx-nav header (e.g. /apps/* tools like loc, exp, snapshot-admin) load
+  // an <nx-profile> of their own as part of that header — mounting ours too would duplicate
+  // (and visually overlap) that affordance rather than add a new one. loadArea() above is what
+  // actually renders the header's blocks, so nx-profile's presence can only be checked after it
+  // resolves, not before.
+  if (!document.querySelector('nx-profile')) {
+    const { mountAuthStatus } = await import('../blocks/shared/da-auth-status/da-auth-status.js');
+    mountAuthStatus();
+  }
 }
 
 loadPage();
