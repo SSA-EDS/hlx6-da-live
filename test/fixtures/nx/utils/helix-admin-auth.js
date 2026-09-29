@@ -10,6 +10,7 @@ window.__helixAdminAuthTestState ??= {
   available: false,
   token: null,
   email: null,
+  name: null,
   throwOnLoad: false,
 };
 export const testState = window.__helixAdminAuthTestState;
@@ -24,6 +25,7 @@ export async function loadIms() {
   return {
     accessToken: { token: testState.token },
     ...(testState.email ? { email: testState.email } : {}),
+    ...(testState.name ? { name: testState.name } : {}),
   };
 }
 

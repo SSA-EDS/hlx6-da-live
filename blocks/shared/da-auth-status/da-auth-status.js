@@ -28,6 +28,7 @@ class DaAuthStatus extends LitElement {
   static properties = {
     _signedIn: { state: true },
     _email: { state: true },
+    _name: { state: true },
   };
 
   connectedCallback() {
@@ -43,6 +44,7 @@ class DaAuthStatus extends LitElement {
     const details = await initIms();
     this._signedIn = !!details?.accessToken;
     this._email = details?.email ?? null;
+    this._name = details?.name ?? null;
   }
 
   render() {
@@ -50,9 +52,10 @@ class DaAuthStatus extends LitElement {
     if (!this._signedIn) {
       return html`<sl-button class="accent" @click=${signIn}>Sign in</sl-button>`;
     }
+    const label = this._name || this._email;
     return html`
       <div class="da-auth-status-signed-in">
-        ${this._email ? html`<span class="da-auth-status-email">${this._email}</span>` : nothing}
+        ${label ? html`<span class="da-auth-status-email">${label}</span>` : nothing}
         <sl-button @click=${signOut}>Sign out</sl-button>
       </div>
     `;
