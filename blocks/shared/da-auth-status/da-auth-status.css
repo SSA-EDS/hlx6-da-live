@@ -6,6 +6,10 @@
   display: block;
 }
 
+:host(.below-nx-nav) {
+  top: calc(var(--nx-nav-height, 70px) + var(--s2-spacing-200, 12px));
+}
+
 .da-auth-status-signed-in {
   display: flex;
   align-items: center;

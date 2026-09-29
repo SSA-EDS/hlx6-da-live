@@ -60,4 +60,26 @@ describe('da-auth-status — no alt provider, signed out', () => {
 
     expect(signInCalls).to.equal(1);
   });
+
+  it('drops below nx-nav\'s header instead of crowding it, when nx-nav is present', async () => {
+    document.body.classList.add('nx-app');
+
+    el = document.createElement('da-auth-status');
+    document.body.append(el);
+    await wait(50);
+    await el.updateComplete;
+
+    expect(el.classList.contains('below-nx-nav')).to.equal(true);
+
+    document.body.classList.remove('nx-app');
+  });
+
+  it('does not add the below-nx-nav class when nx-nav is not present', async () => {
+    el = document.createElement('da-auth-status');
+    document.body.append(el);
+    await wait(50);
+    await el.updateComplete;
+
+    expect(el.classList.contains('below-nx-nav')).to.equal(false);
+  });
 });

@@ -34,6 +34,10 @@ class DaAuthStatus extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     this.shadowRoot.adoptedStyleSheets = [STYLE];
+    // nx-nav's own header (decorateHeader() in nexter.js) marks the body 'nx-app' and renders
+    // its own action-area content (e.g. the Feedback button) flush to the top-right corner —
+    // the same corner this floats in by default. Drop below the nav bar instead of crowding it.
+    this.classList.toggle('below-nx-nav', document.body.classList.contains('nx-app'));
     this.refresh();
   }
 
