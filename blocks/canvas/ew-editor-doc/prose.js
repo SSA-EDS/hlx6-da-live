@@ -37,8 +37,8 @@ import imageDrop from './prose-plugins/imageDrop.js';
 import imageFocalPoint from '../../edit/prose/plugins/imageFocalPoint.js';
 import sectionPasteHandler from '../../edit/prose/plugins/sectionPasteHandler.js';
 import base64Uploader from './prose-plugins/base64Uploader.js';
-import { getNx } from '../../../scripts/utils.js';
-import { getAuthToken, initIms } from '../../shared/utils.js';
+import { getNx, getNx2Api } from '../../../scripts/utils.js';
+import { getAuthToken, initIms, resolveAuthModule } from '../../shared/utils.js';
 import { generateColor, getCollabIdentity } from './utils/collab.js';
 import { checkBlockLibraryConfigured } from '../editor-utils/block-slash.js';
 
@@ -93,7 +93,9 @@ export default async function initProse({
   const ydoc = new Y.Doc();
 
   const server = DA_COLLAB;
-  const roomName = `${DA_ADMIN}${new URL(path).pathname}`;
+  const { pathname } = new URL(path);
+  const [, , org, site] = pathname.split('/');
+  const roomName = `${DA_ADMIN}${pathname}`;
 
   const wsOpts = { protocols: ['yjs'] };
   let lastSentToken = null;
@@ -118,7 +120,19 @@ export default async function initProse({
     }
     if (event?.code === 4401) {
       try { await window.adobeIMS?.refreshToken?.(); } catch { /* ignore */ }
-      const fresh = await getAuthToken();
+      let fresh = await getAuthToken();
+      if ((!fresh || fresh === lastSentToken) && org && site) {
+        // getAuthToken() only ever returns initIms()'s memoized, page-load-time token — it
+        // never learns about a site-scoped token minted later by daFetch's own upgrade (see
+        // shared/utils.js). Without this, a connection opened with the alt provider's
+        // account-level token 4401s here forever even though a working site token exists.
+        const { useAlt } = await resolveAuthModule();
+        if (useAlt) {
+          const { getAemSiteToken } = await getNx2Api();
+          const { siteToken } = await getAemSiteToken({ org, site });
+          if (siteToken) fresh = siteToken;
+        }
+      }
       if (!fresh || fresh === lastSentToken) {
         wsProvider.shouldConnect = false;
         if (lastSentToken) {
