@@ -31,33 +31,42 @@ describe('da-auth-status — no alt provider, signed out', () => {
     expect(customElements.get('da-auth-status')).to.exist;
   });
 
-  it('renders a Sign in button', async () => {
+  it('renders nothing when signed out — nx-profile is the only sign-in affordance', async () => {
+    window.adobeIMS = { getAccessToken: () => null };
+
     el = document.createElement('da-auth-status');
     document.body.append(el);
     await wait(50);
     await el.updateComplete;
 
-    const btn = el.shadowRoot.querySelector('sl-button');
-    expect(btn).to.exist;
-    expect(btn.textContent.trim()).to.equal('Sign in');
+    expect(el.shadowRoot.querySelector('.da-auth-status-label')).to.not.exist;
+    expect(el.shadowRoot.textContent.trim()).to.equal('');
   });
 
-  it('Sign in click delegates to the resolved provider (ims.js here)', async () => {
-    let signInCalls = 0;
-    // getAccessToken is included because attachAuthMonitor's storage listener (initIms(),
-    // triggered by the ims.js fallback path) reads it on any 'storage' event that fires
-    // during the test run (e.g. from another test file's localStorage cleanup) — omitting it
-    // throws inside that listener, an unhandled rejection unrelated to what this test checks.
-    window.adobeIMS = { signIn: () => { signInCalls += 1; }, getAccessToken: () => null };
+  it('finds a nearby nx-nav and offsets to its left', async () => {
+    const nav = document.createElement('nx-nav');
+    nav.style.cssText = 'position: fixed; top: 0; left: 1000px; width: 200px; height: 1px;';
+    document.body.append(nav);
 
+    try {
+      el = document.createElement('da-auth-status');
+      document.body.append(el);
+      await wait(50);
+      await el.updateComplete;
+
+      const offset = el.style.getPropertyValue('--da-auth-status-right');
+      expect(offset).to.equal(`${window.innerWidth - 1000}px`);
+    } finally {
+      nav.remove();
+    }
+  });
+
+  it('falls back to the CSS default offset when there is no nx-nav on the page', async () => {
     el = document.createElement('da-auth-status');
     document.body.append(el);
     await wait(50);
     await el.updateComplete;
 
-    el.shadowRoot.querySelector('sl-button').click();
-    await wait(50);
-
-    expect(signInCalls).to.equal(1);
+    expect(el.style.getPropertyValue('--da-auth-status-right')).to.equal('');
   });
 });

@@ -1,6 +1,5 @@
 import { expect } from '@esm-bundle/chai';
 import { setNx } from '../../../../../scripts/utils.js';
-import { testHooks } from '../../../../../blocks/shared/utils.js';
 import { testState as altAuthState } from '../../../../fixtures/nx/utils/helix-admin-auth.js';
 
 const wait = (ms) => new Promise((r) => { setTimeout(r, ms); });
@@ -9,7 +8,6 @@ setNx('/test/fixtures/nx', { hostname: 'example.com' });
 
 describe('da-auth-status — alt provider, signed in with an email', () => {
   let el;
-  let origReload;
 
   before(async () => {
     altAuthState.available = true;
@@ -18,40 +16,20 @@ describe('da-auth-status — alt provider, signed in with an email', () => {
     await import('../../../../../blocks/shared/da-auth-status/da-auth-status.js');
   });
 
-  beforeEach(() => {
-    origReload = testHooks.reload;
-  });
-
   afterEach(() => {
     el?.remove();
     el = null;
-    testHooks.reload = origReload;
   });
 
-  it('renders the email and a Sign out button, not a Sign in button', async () => {
+  it('renders only the email label — nx-profile owns sign-out, not this component', async () => {
     el = document.createElement('da-auth-status');
     document.body.append(el);
     await wait(50);
     await el.updateComplete;
 
-    expect(el.shadowRoot.querySelector('.da-auth-status-email').textContent.trim())
+    expect(el.shadowRoot.querySelector('.da-auth-status-label').textContent.trim())
       .to.equal('user@example.com');
-    const btn = el.shadowRoot.querySelector('sl-button');
-    expect(btn.textContent.trim()).to.equal('Sign out');
-  });
-
-  it('Sign out clears the session and reloads (reload stubbed via testHooks)', async () => {
-    let reloadCalls = 0;
-    testHooks.reload = () => { reloadCalls += 1; };
-
-    el = document.createElement('da-auth-status');
-    document.body.append(el);
-    await wait(50);
-    await el.updateComplete;
-
-    el.shadowRoot.querySelector('sl-button').click();
-    await wait(50);
-
-    expect(reloadCalls).to.equal(1);
+    expect(el.shadowRoot.querySelector('sl-button')).to.not.exist;
+    expect(el.shadowRoot.querySelector('button')).to.not.exist;
   });
 });
