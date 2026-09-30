@@ -32,7 +32,7 @@ describe('da-auth-status — alt provider, signed in with a name', () => {
     await wait(50);
     await el.updateComplete;
 
-    expect(el.shadowRoot.querySelector('.da-auth-status-email').textContent.trim())
+    expect(el.shadowRoot.querySelector('.da-auth-status-label').textContent.trim())
       .to.equal('Test User');
   });
 });
