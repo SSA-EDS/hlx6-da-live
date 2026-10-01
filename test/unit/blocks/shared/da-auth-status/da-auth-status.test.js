@@ -69,4 +69,49 @@ describe('da-auth-status — no alt provider, signed out', () => {
 
     expect(el.style.getPropertyValue('--da-auth-status-right')).to.equal('');
   });
+
+  it('picks up nx-nav even if it is added to the page after this component connects', async () => {
+    el = document.createElement('da-auth-status');
+    document.body.append(el);
+    await wait(50);
+    await el.updateComplete;
+    expect(el.style.getPropertyValue('--da-auth-status-right')).to.equal('');
+
+    const nav = document.createElement('nx-nav');
+    nav.style.cssText = 'position: fixed; top: 0; left: 800px; width: 200px; height: 1px;';
+    document.body.append(nav);
+
+    try {
+      await wait(50);
+      expect(el.style.getPropertyValue('--da-auth-status-right')).to.equal(`${window.innerWidth - 800}px`);
+    } finally {
+      nav.remove();
+    }
+  });
+
+  it('recomputes when nx-nav\'s own size settles after an initial, smaller render', async () => {
+    // Anchored via `right`, not `left` — so a width change (what ResizeObserver actually
+    // detects) also moves the computed left edge this component reads, same as a real nav bar
+    // growing to fit its just-rendered Feedback/profile content.
+    const nav = document.createElement('nx-nav');
+    nav.style.cssText = 'position: fixed; top: 0; right: 0; width: 50px; height: 1px;';
+    document.body.append(nav);
+
+    try {
+      el = document.createElement('da-auth-status');
+      document.body.append(el);
+      await wait(50);
+      await el.updateComplete;
+      const initialLeft = nav.getBoundingClientRect().left;
+      expect(el.style.getPropertyValue('--da-auth-status-right')).to.equal(`${window.innerWidth - initialLeft}px`);
+
+      nav.style.width = '200px';
+      await wait(50);
+      const grownLeft = nav.getBoundingClientRect().left;
+      expect(grownLeft).to.not.equal(initialLeft);
+      expect(el.style.getPropertyValue('--da-auth-status-right')).to.equal(`${window.innerWidth - grownLeft}px`);
+    } finally {
+      nav.remove();
+    }
+  });
 });

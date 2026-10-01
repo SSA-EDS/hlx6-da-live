@@ -33,7 +33,8 @@ class DaAuthStatus extends LitElement {
     super.connectedCallback();
     this.shadowRoot.adoptedStyleSheets = [STYLE];
     this.refresh();
-    this.reposition();
+    this._resizeObserver = new ResizeObserver(() => this.reposition());
+    this._observeNav();
     this._onResize = () => this.reposition();
     window.addEventListener('resize', this._onResize);
   }
@@ -41,6 +42,33 @@ class DaAuthStatus extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback();
     window.removeEventListener('resize', this._onResize);
+    this._resizeObserver.disconnect();
+    this._navMutationObserver?.disconnect();
+  }
+
+  // nx-nav's own content (Feedback, nx-profile) renders asynchronously, after an unawaited
+  // dynamic import of its own definition (see hlx6-da-nx's loadArea()) — nav's host element
+  // can exist before that, at whatever placeholder size/position it has pre-render. A single
+  // measurement right after mount can land on that placeholder instead of nav's real,
+  // populated layout. Watching for both nav's arrival (if it isn't there yet) and its size
+  // settling (once it is) keeps this correct without guessing how long either one takes.
+  _observeNav() {
+    const nav = document.querySelector('nx-nav');
+    if (nav) {
+      this._resizeObserver.observe(nav);
+      this.reposition();
+      return;
+    }
+    this.reposition();
+    this._navMutationObserver = new MutationObserver(() => {
+      const found = document.querySelector('nx-nav');
+      if (!found) return;
+      this._navMutationObserver.disconnect();
+      this._navMutationObserver = null;
+      this._resizeObserver.observe(found);
+      this.reposition();
+    });
+    this._navMutationObserver.observe(document.body, { childList: true, subtree: true });
   }
 
   // nx-nav renders its own action area (Feedback, nx-profile) inside its shadow DOM — not
