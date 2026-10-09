@@ -403,11 +403,10 @@ describe('daFetch', () => {
     expect(resp.status).to.equal(403);
   });
 
-  it('On 401 for the alt provider with org/site known, exchanges for a site-scoped token and retries', async () => {
+  it('For the alt provider with org/site known, sends the site-scoped token on the first request', async () => {
     // initIms() (see the 'initIms' describe block above) is already memoized in this file to
-    // the alt provider, signed in as 'hlxtst_abc.def.ghi' — that's the token the first call
-    // below carries; the exchange (mocked via the nx2 api fixture's testState) supplies the
-    // second.
+    // the alt provider, signed in as 'hlxtst_abc.def.ghi' — the account-level token; the exchange
+    // (mocked via the nx2 api fixture's testState) supplies the site-scoped one.
     window.localStorage.setItem('nx-ims', 'true');
     nx2ApiTestState.siteToken = 'hlxtst_site.scoped.token';
 
@@ -416,7 +415,7 @@ describe('daFetch', () => {
     window.fetch = (url, opts) => {
       fetchCalls += 1;
       capturedAuth.push(opts?.headers?.Authorization);
-      return Promise.resolve(new Response('ok', { status: fetchCalls === 1 ? 401 : 200 }));
+      return Promise.resolve(new Response('ok', { status: 200 }));
     };
 
     const resp = await daFetch(
@@ -426,16 +425,14 @@ describe('daFetch', () => {
     );
 
     expect(resp.ok).to.equal(true);
-    expect(fetchCalls).to.equal(2);
-    expect(capturedAuth).to.deep.equal(['Bearer hlxtst_abc.def.ghi', 'Bearer hlxtst_site.scoped.token']);
+    expect(fetchCalls).to.equal(1);
+    expect(capturedAuth).to.deep.equal(['Bearer hlxtst_site.scoped.token']);
   });
 
-  it('Derives org/site from the URL and exchanges for a site-scoped token when the caller '
+  it('Derives org/site from the URL and sends the site-scoped token when the caller '
     + 'does not pass them explicitly', async () => {
     // Regression test: callers like ew-editor-doc/utils/source.js's checkDoc() call daFetch
-    // without a third {org, site} argument at all — the upgrade attempt used to be silently
-    // skipped for those, leaving a stale account-level token to hit the no-access redirect
-    // below instead of ever trying to exchange it.
+    // without a third {org, site} argument at all, so the exchange must not depend on it.
     window.localStorage.setItem('nx-ims', 'true');
     nx2ApiTestState.siteToken = 'hlxtst_site.scoped.token';
 
@@ -444,14 +441,30 @@ describe('daFetch', () => {
     window.fetch = (url, opts) => {
       fetchCalls += 1;
       capturedAuth.push(opts?.headers?.Authorization);
-      return Promise.resolve(new Response('ok', { status: fetchCalls === 1 ? 401 : 200 }));
+      return Promise.resolve(new Response('ok', { status: 200 }));
     };
 
     const resp = await daFetch('http://localhost:8787/source/o/r/p.html');
 
     expect(resp.ok).to.equal(true);
-    expect(fetchCalls).to.equal(2);
-    expect(capturedAuth).to.deep.equal(['Bearer hlxtst_abc.def.ghi', 'Bearer hlxtst_site.scoped.token']);
+    expect(fetchCalls).to.equal(1);
+    expect(capturedAuth).to.deep.equal(['Bearer hlxtst_site.scoped.token']);
+  });
+
+  it('Falls back to the account-level token when the site-token exchange yields none', async () => {
+    window.localStorage.setItem('nx-ims', 'true');
+    nx2ApiTestState.siteToken = null;
+
+    const capturedAuth = [];
+    window.fetch = (url, opts) => {
+      capturedAuth.push(opts?.headers?.Authorization);
+      return Promise.resolve(new Response('ok', { status: 200 }));
+    };
+
+    const resp = await daFetch('http://localhost:8787/source/o/r/p.html');
+
+    expect(resp.ok).to.equal(true);
+    expect(capturedAuth).to.deep.equal(['Bearer hlxtst_abc.def.ghi']);
   });
 
   it('Does not attempt the site-token exchange when org/site are not passed and cannot be '
