@@ -147,32 +147,28 @@ export const daFetch = async (url, opts = {}, { org, site } = {}) => {
   };
 
   const accessToken = await getAuthToken();
-  if (accessToken) setBearer(accessToken);
-
-  let resp = await fetch(url, opts);
-
   const isDaOrigin = DA_ORIGINS.some((origin) => url.startsWith(origin));
 
   // The alt provider's account-level token (no site/org yet — see helix-admin-ams's
-  // getTransientAccountTokenInfo) can't satisfy da-admin's per-site audience check, so this
-  // 401s until upgraded. IMS never hits this: its token already works for any site. Mirrors
-  // nx2/utils/api.js's daFetch (hlx6-da-nx) — same reason, same fix. Falls back to parsing
-  // org/site from the URL when the caller doesn't pass them, so every DA-origin call site
-  // gets the upgrade attempt, not just the ones that remembered to pass {org, site}.
-  if (resp.status === 401 && isDaOrigin) {
-    const resolved = (org && site) ? { org, site } : parseOrgSiteFromUrl(url);
-    if (resolved.org && resolved.site) {
-      const { useAlt } = await resolveAuthModule();
-      if (useAlt) {
-        const { getAemSiteToken } = await getNx2Api();
-        const { siteToken } = await getAemSiteToken(resolved);
-        if (siteToken && siteToken !== accessToken) {
-          setBearer(siteToken);
-          resp = await fetch(url, opts);
-        }
-      }
+  // getTransientAccountTokenInfo) can't satisfy da-admin's per-site audience check, so it
+  // would 401 on every call. IMS never hits this: its token already works for any site.
+  // Mirrors nx2/utils/api.js's daFetch (hlx6-da-nx). Falls back to parsing org/site from the
+  // URL when the caller doesn't pass them, so every DA-origin call site gets the upgrade.
+  // Done up front, not after a 401: the exchange is cached per site, so a failed one just
+  // leaves the account-level token in use.
+  let token = accessToken;
+  const target = (org && site) ? { org, site } : parseOrgSiteFromUrl(url);
+  if (accessToken && isDaOrigin && target.org && target.site) {
+    const { useAlt } = await resolveAuthModule();
+    if (useAlt) {
+      const { getAemSiteToken } = await getNx2Api();
+      const { siteToken } = await getAemSiteToken(target);
+      if (siteToken) token = siteToken;
     }
   }
+  if (token) setBearer(token);
+
+  let resp = await fetch(url, opts);
 
   if (resp.status === 401 && opts.noRedirect !== true && isDaOrigin) {
     // Silent recovery: another tab may have just refreshed/signed in. Ask imslib
