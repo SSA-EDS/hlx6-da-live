@@ -107,7 +107,12 @@ export async function signOut() {
 
 export async function getAuthToken() {
   if (!localStorage.getItem('nx-ims')) {
-    return null;
+    // The alt provider may sign in silently while initIms() runs; going anonymous before that
+    // settles sends requests that 401. IMS has nothing to wait for.
+    const { useAlt } = await resolveAuthModule();
+    if (!useAlt) return null;
+    await initIms();
+    if (!localStorage.getItem('nx-ims')) return null;
   }
   // imslib auto-refreshes its internal token; reading it live avoids returning the
   // page-load snapshot that nx's loadIms() captured once in its onReady handler.

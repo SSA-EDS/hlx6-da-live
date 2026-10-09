@@ -11,6 +11,7 @@ window.__helixAdminAuthTestState ??= {
   token: null,
   email: null,
   name: null,
+  silentToken: null,
   throwOnLoad: false,
 };
 export const testState = window.__helixAdminAuthTestState;
@@ -21,6 +22,12 @@ export function isAvailable() {
 
 export async function loadIms() {
   if (testState.throwOnLoad) throw new Error('boom');
+  if (!testState.token && testState.silentToken) {
+    // Mimics the real provider signing in silently from an existing session during startup.
+    await new Promise((resolve) => { setTimeout(resolve, 20); });
+    localStorage.setItem('nx-ims', true);
+    return { accessToken: { token: testState.silentToken } };
+  }
   if (!testState.token) return { anonymous: true };
   return {
     accessToken: { token: testState.token },
